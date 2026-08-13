@@ -1,0 +1,16 @@
+{
+	"node": "n8n-nodes-delight",
+	"nodeVersion": "1.0",
+	"codexVersion": "1.0",
+	"categories": [
+		"Finance & Accounting",
+		"Productivity"
+	],
+	"resources": {
+		"primaryDocumentation": [
+			{
+				"url": "https://delight.ch/delight-knowledge-base/#/{67804FC1-8EE3-4FFE-8F79-10ADBFDBFE18}"
+			}
+		]
+	}
+}
