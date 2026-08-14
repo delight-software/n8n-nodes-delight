@@ -26,38 +26,38 @@ export const datasetFields: INodeProperties[] = [
 			{
 				name: 'Create',
 				value: 'create',
-				action: 'Create an record',
-				description: 'Create an record'
+				action: 'Create record',
+				description: 'Create a new record'
 			},
 			{
 				name: 'Create or Update',
 				value: 'createOrUpdate',
 				action: 'Create or update',
-				description: 'Create a new record, or update the current one if it already exists'
+				description: 'Create a new record, or update an existing one'
 			},
 			{
 				name: 'Delete',
 				value: 'delete',
-				action: 'Delete an record',
-				description: 'Delete an record'
+				action: 'Delete record',
+				description: 'Delete a record permanently'
 			},
 			{
 				name: 'Get',
 				value: 'get',
-				action: 'Get an record',
-				description: 'Get an record'
+				action: 'Get record',
+				description: 'Get a record'
 			},
 			{
 				name: 'Get Many',
 				value: 'getMany',
 				action: 'Get records',
-				description: 'Get records'
+				description: 'Get many records'
 			},
 			{
 				name: 'Update',
 				value: 'update',
-				action: 'Update an record',
-				description: 'Update an record'
+				action: 'Update record',
+				description: 'Update a record'
 			}
 		],
 		default: 'create'

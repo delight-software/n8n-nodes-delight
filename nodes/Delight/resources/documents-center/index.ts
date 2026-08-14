@@ -25,8 +25,8 @@ export const documentsCenterFields: INodeProperties[] = [
 			{
 				name: 'Upload Document',
 				value: 'create',
-				action: 'Upload a document',
-				description: 'Upload a file to the Documents Center inbox'
+				action: 'Upload document',
+				description: 'Upload a file to the document center'
 			}
 		],
 		default: 'create'
