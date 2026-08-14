@@ -1,11 +1,10 @@
-import { IExecuteFunctions } from 'n8n-workflow'
-import { DelightApiResponse } from '../../../types'
+import { IExecuteFunctions, JsonObject } from 'n8n-workflow'
 import { getRecords } from '../../../api/events'
 
 export async function executeDatasetGetMany(
 	this: IExecuteFunctions,
 	itemIndex: number
-): Promise<DelightApiResponse> {
+): Promise<JsonObject[]> {
 	const schema = this.getNodeParameter('schema', itemIndex) as string
 	const returnFields = this.getNodeParameter('returnFields', itemIndex, []) as string[]
 	const filtersData = this.getNodeParameter('filters', itemIndex, {}) as {
@@ -54,5 +53,6 @@ export async function executeDatasetGetMany(
 		pagination.count = limit
 	}
 
-	return await getRecords.call(this, schema, apiFilters, returnFields, pagination)
+	const response = await getRecords.call(this, schema, apiFilters, returnFields, pagination)
+	return response?.records ?? []
 }

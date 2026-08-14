@@ -7,12 +7,13 @@ import {
 	JsonValue
 } from 'n8n-workflow'
 import {
-	DelightApiResponse,
-	DelightCreateRecordsResponse,
-	DelightQueryRecordsResponse,
+	DelightAddRecordsPayload,
+	DelightDeleteRecordsPayload,
+	DelightQueryRecordsPayload,
+	DelightQuerySchemasPayload,
 	DelightSchema,
 	DelightSchemaField,
-	DelightSchemasResponse
+	DelightUpdateRecordsPayload
 } from '../types'
 import { delightApiRequest } from './delightApi'
 import { FORBIDDEN_NAMES, FORBIDDEN_TYPES } from '../constants/forbiddenFields'
@@ -25,13 +26,14 @@ export async function getSchemas(
 	includeFields: boolean = true,
 	language: string = 'german'
 ): Promise<DelightSchema[]> {
-	const response = (await delightApiRequest.call(this, 'POST', '/database/schema/QuerySchemas', [
-		schemaNames,
-		includeFields,
-		language
-	])) as DelightSchemasResponse
+	const response = await delightApiRequest<DelightQuerySchemasPayload>(
+		this,
+		'POST',
+		'/database/schema/QuerySchemas',
+		[schemaNames, includeFields, language]
+	)
 
-	return response?.result?.[1]?.schemas ?? []
+	return response?.schemas ?? []
 }
 
 export async function getSchemaFields(
@@ -62,12 +64,13 @@ export async function addRecord(
 	schemaName: string,
 	fieldValues: JsonObject[],
 	fieldKeys: JsonValue[]
-): Promise<DelightCreateRecordsResponse> {
-	return (await delightApiRequest.call(this, 'POST', '/database/table/AddRecord', [
-		schemaName,
-		fieldValues,
-		fieldKeys
-	])) as DelightCreateRecordsResponse
+): Promise<DelightAddRecordsPayload> {
+	return await delightApiRequest<DelightAddRecordsPayload>(
+		this,
+		'POST',
+		'/database/table/AddRecord',
+		[schemaName, fieldValues, fieldKeys]
+	)
 }
 
 export async function updateRecord(
@@ -76,12 +79,13 @@ export async function updateRecord(
 	guid: string,
 	fieldValues: JsonObject,
 	fieldKeys: string[]
-): Promise<DelightCreateRecordsResponse> {
-	return (await delightApiRequest.call(this, 'POST', '/database/table/UpdateRecord', [
-		schemaName,
-		[{ server_uid: guid, ...fieldValues }],
-		fieldKeys
-	])) as DelightCreateRecordsResponse
+): Promise<DelightUpdateRecordsPayload> {
+	return await delightApiRequest<DelightUpdateRecordsPayload>(
+		this,
+		'POST',
+		'/database/table/UpdateRecord',
+		[schemaName, [{ server_uid: guid, ...fieldValues }], fieldKeys]
+	)
 }
 
 export async function getRecords(
@@ -90,23 +94,23 @@ export async function getRecords(
 	filters: unknown[],
 	returnFields: unknown[] = [],
 	pagination: JsonObject = { start: -1, count: -1 }
-): Promise<DelightQueryRecordsResponse> {
+): Promise<DelightQueryRecordsPayload> {
 	const fieldsToReturn = [...new Set(['globalrecuid', ...returnFields])]
 	const body = [schemaName, filters, fieldsToReturn, pagination]
 
-	return (await delightApiRequest.call(
+	return await delightApiRequest<DelightQueryRecordsPayload>(
 		this,
 		'POST',
-		`/database/table/QueryRecords`,
+		'/database/table/QueryRecords',
 		body
-	)) as DelightQueryRecordsResponse
+	)
 }
 
 export async function deleteRecord(
 	this: ThisContext,
 	schemaName: string,
 	guid: string
-): Promise<DelightQueryRecordsResponse> {
+): Promise<DelightDeleteRecordsPayload> {
 	const filter = {
 		fieldname: 'globalrecuid',
 		filtertype: '=',
@@ -114,22 +118,22 @@ export async function deleteRecord(
 	}
 	const body = [schemaName, [filter]]
 
-	return (await delightApiRequest.call(
+	return await delightApiRequest<DelightDeleteRecordsPayload>(
 		this,
 		'POST',
-		`/database/table/DeleteRecords`,
+		'/database/table/DeleteRecords',
 		body
-	)) as DelightQueryRecordsResponse
+	)
 }
 
 export async function addDocument(
 	this: ThisContext,
 	data: JsonObject[]
-): Promise<DelightApiResponse> {
-	return (await delightApiRequest.call(
+): Promise<DelightAddRecordsPayload> {
+	return await delightApiRequest<DelightAddRecordsPayload>(
 		this,
 		'POST',
 		'/documentscenter/DocumentsInbox/AddDocuments',
 		data
-	)) as DelightApiResponse
+	)
 }

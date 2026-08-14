@@ -1,12 +1,11 @@
-import { IExecuteFunctions } from 'n8n-workflow'
-import { DelightApiResponse } from '../../../types'
+import { IExecuteFunctions, JsonObject } from 'n8n-workflow'
 import { getRecords } from '../../../api/events'
 import { getValidatedGlobalRecUid } from '../../../utils/validators'
 
 export async function executeDatasetGet(
 	this: IExecuteFunctions,
 	itemIndex: number
-): Promise<DelightApiResponse> {
+): Promise<JsonObject> {
 	const recordId = getValidatedGlobalRecUid(this, 'recordId', itemIndex)
 	const schema = this.getNodeParameter('schema', itemIndex) as string
 	const returnFields = this.getNodeParameter('returnFields', itemIndex, []) as string[]
@@ -18,5 +17,6 @@ export async function executeDatasetGet(
 		}
 	]
 
-	return await getRecords.call(this, schema, filters, returnFields)
+	const response = await getRecords.call(this, schema, filters, returnFields)
+	return response?.records?.[0] ?? {}
 }

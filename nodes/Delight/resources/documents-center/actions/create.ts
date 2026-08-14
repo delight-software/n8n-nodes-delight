@@ -1,5 +1,4 @@
 import { IExecuteFunctions, JsonObject, JsonValue, NodeOperationError } from 'n8n-workflow'
-import { DelightApiResponse } from '../../../types'
 import { addDocument } from '../../../api/events'
 import { createEmlBase64, EmailAttachment, normalizeEmail } from '../../../utils/normalizeEmail'
 
@@ -40,7 +39,7 @@ type RecordDocumentsEmailObject = {
 export async function executeDocumentsCenterCreate(
 	this: IExecuteFunctions,
 	itemIndex: number
-): Promise<DelightApiResponse> {
+): Promise<JsonObject> {
 	const items = this.getInputData()
 	const item = items[itemIndex]
 
@@ -144,5 +143,9 @@ export async function executeDocumentsCenterCreate(
 		}
 	}
 
-	return await addDocument.call(this, [requestData])
+	const response = await addDocument.call(this, [requestData])
+
+	const recordInfo = response?.record_info?.[0]
+
+	return recordInfo ? { ...recordInfo } : {}
 }

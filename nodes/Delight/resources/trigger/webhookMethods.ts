@@ -55,13 +55,13 @@ const findNotificationHandlerTrigger = async (
 		}
 	]
 
-	const { result } = await getRecords.call(
+	const result = await getRecords.call(
 		context,
 		'@table:notificationhandler_triggers',
 		filters,
 		returnFields
 	)
-	const records = result?.[1]?.records || []
+	const records = result?.records || []
 
 	if (records.length > 0) {
 		return {
@@ -103,14 +103,14 @@ export const webhookMethods = {
 				triggerendpointtypeident: 'HTTPPOSTJSON'
 			}
 
-			const { result: createEndpointResult } = await addRecord.call(
+			const createEndpointResult = await addRecord.call(
 				this,
 				'@table:notificationhandler_triggerendpoints',
 				endpointValues as unknown as JsonObject[],
 				Object.keys(endpointValues)
 			)
 
-			const endpointGUID = createEndpointResult?.[1]?.record_info?.[0]?.server_uid
+			const endpointGUID = createEndpointResult?.record_info?.[0]?.server_uid
 			if (!endpointGUID) {
 				throw new NodeOperationError(this.getNode(), 'Missing Endpoint ID from CRM', {
 					description:
@@ -133,14 +133,14 @@ export const webhookMethods = {
 				}
 			]
 
-			const { result: createTriggerResult } = await addRecord.call(
+			const createTriggerResult = await addRecord.call(
 				this,
 				'@table:notificationhandler_triggers',
 				triggerValues as unknown as JsonObject[],
 				triggerKeys
 			)
 
-			const triggerId = createTriggerResult?.[1]?.record_info?.[0]?.server_uid
+			const triggerId = createTriggerResult?.record_info?.[0]?.server_uid
 			if (!triggerId) {
 				throw new NodeOperationError(this.getNode(), 'Missing Trigger ID from CRM', {
 					description:

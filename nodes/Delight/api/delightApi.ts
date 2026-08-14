@@ -12,7 +12,7 @@ import type {
 	IHookFunctions
 } from 'n8n-workflow'
 
-import { DelightApiResponse } from '../types'
+import { DelightApiResult } from '../types'
 import { NodeApiError } from 'n8n-workflow'
 
 interface CachedSession {
@@ -93,7 +93,7 @@ export async function getSessionKey(
 	return newSessionKey
 }
 
-function validateApiResponse(node: INode, response: DelightApiResponse): boolean {
+function validateApiResponse(node: INode, response: DelightApiResult): boolean {
 	const result = response?.result
 	if (!result) {
 		throw new NodeApiError(
@@ -129,17 +129,17 @@ function validateApiResponse(node: INode, response: DelightApiResponse): boolean
 }
 
 export async function delightApiRequest<T = IDataObject>(
-	this: ThisContext,
+	context: ThisContext,
 	method: IHttpRequestMethods,
 	endpoint: string,
 	body: FormData | GenericValue | GenericValue[] | Buffer | URLSearchParams,
 	qs: IDataObject = {}
-): Promise<DelightApiResponse<T>> {
-	const credentials = await this.getCredentials('delightApi')
+): Promise<T> {
+	const credentials = await context.getCredentials('delightApi')
 	const baseUrl = (credentials.restApiUrl as string).replace(/\/$/, '')
 
-	const makeRequest = async (forceRefresh: boolean): Promise<DelightApiResponse<T>> => {
-		const sessionKey = await getSessionKey.call(this, forceRefresh)
+	const makeRequest = async (forceRefresh: boolean): Promise<T> => {
+		const sessionKey = await getSessionKey.call(context, forceRefresh)
 
 		const options: IHttpRequestOptions = {
 			method,
@@ -153,9 +153,10 @@ export async function delightApiRequest<T = IDataObject>(
 		}
 
 		try {
-			const result = await this.helpers.httpRequest(options)
-			validateApiResponse(this.getNode(), result)
-			return result as DelightApiResponse<T>
+			const response = await context.helpers.httpRequest(options)
+			validateApiResponse(context.getNode(), response)
+
+			return response.result[1]
 		} catch (error) {
 			const errorData = error?.response?.data
 
@@ -165,7 +166,7 @@ export async function delightApiRequest<T = IDataObject>(
 				return await makeRequest(true)
 			}
 
-			throw new NodeApiError(this.getNode(), error as JsonObject)
+			throw new NodeApiError(context.getNode(), error as JsonObject)
 		}
 	}
 

@@ -7,7 +7,6 @@ import {
 	type INodeType,
 	type INodeTypeDescription
 } from 'n8n-workflow'
-import { DelightApiResponse } from './types'
 import { datasetFields, executeDataset } from './resources/dataset'
 import { documentsCenterFields, executeDocumentsCenter } from './resources/documents-center'
 import * as loadOptions from './methods/loadOptions'
@@ -71,7 +70,7 @@ export class Delight implements INodeType {
 		for (let i = 0; i < items.length; i++) {
 			try {
 				const resource = this.getNodeParameter('resource', i) as string
-				let responseData: DelightApiResponse
+				let responseData: JsonObject | JsonObject[]
 
 				switch (resource) {
 					case 'dataset':

@@ -1,12 +1,11 @@
-import type { IExecuteFunctions } from 'n8n-workflow'
+import type { IExecuteFunctions, JsonObject } from 'n8n-workflow'
 import { NodeOperationError } from 'n8n-workflow'
-import { DelightApiResponse } from '../../types'
 import { executeDocumentsCenterCreate } from './actions/create'
 
 export async function executeDocumentsCenter(
 	this: IExecuteFunctions,
 	itemIndex: number
-): Promise<DelightApiResponse> {
+): Promise<JsonObject> {
 	const operation = this.getNodeParameter('operation', itemIndex) as string
 
 	switch (operation) {

@@ -31,7 +31,7 @@ export async function poll(this: IPollFunctions): Promise<INodeExecutionData[][]
 
 		const response = await getRecords.call(this, schema, filters, returnFields)
 
-		const records = response.result[1]?.records || []
+		const records = response.records || []
 
 		staticData.lastPollTime = now
 
@@ -39,11 +39,7 @@ export async function poll(this: IPollFunctions): Promise<INodeExecutionData[][]
 			return null
 		}
 
-		const executionData = records.map((record) => ({
-			json: record
-		}))
-
-		return [executionData]
+		return [this.helpers.returnJsonArray(records)]
 	} catch (error) {
 		staticData.lastPollTime = now
 		throw new NodeOperationError(this.getNode(), error)
