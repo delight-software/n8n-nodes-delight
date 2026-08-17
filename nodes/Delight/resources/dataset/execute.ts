@@ -1,4 +1,4 @@
-import type { IExecuteFunctions, JsonObject } from 'n8n-workflow'
+import type { IExecuteFunctions, INodeExecutionData, JsonObject } from 'n8n-workflow'
 import { NodeOperationError } from 'n8n-workflow'
 import { executeDatasetCreate } from './actions/create'
 import { executeDatasetGetMany } from './actions/getAll'
@@ -10,7 +10,7 @@ import { executeDatasetCreateOrUpdate } from './actions/createOrUpdate'
 export async function executeDataset(
 	this: IExecuteFunctions,
 	itemIndex: number
-): Promise<JsonObject | JsonObject[]> {
+): Promise<JsonObject | JsonObject[] | INodeExecutionData> {
 	const operation = this.getNodeParameter('operation', itemIndex) as string
 
 	switch (operation) {

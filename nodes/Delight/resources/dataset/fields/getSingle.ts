@@ -1,4 +1,5 @@
 import type { INodeProperties } from 'n8n-workflow'
+import { SCHEMAS_WITH_DOCUMENTS } from '../../../constants/schemas'
 
 const showOnlyForDatasetGetSingle = {
 	operation: ['get'],
@@ -16,5 +17,35 @@ export const datasetGetSingleFields: INodeProperties[] = [
 			show: showOnlyForDatasetGetSingle
 		},
 		description: 'Globalrecuid of the record to retrieve'
+	},
+	{
+		displayName: 'Options',
+		name: 'options',
+		type: 'collection',
+		placeholder: 'Add Option',
+		default: {},
+		displayOptions: {
+			show: {
+				...showOnlyForDatasetGetSingle,
+				schema: SCHEMAS_WITH_DOCUMENTS
+			}
+		},
+		options: [
+			{
+				displayName: 'Download Documents',
+				name: 'downloadDocuments',
+				type: 'boolean',
+				default: false,
+				description: 'Whether the documents will be downloaded and included in the output'
+			},
+			{
+				displayName: 'Document Prefix',
+				name: 'documentPrefix',
+				type: 'string',
+				default: 'document_',
+				description:
+					"Prefix for name of the binary property to which to write the document. An index starting with 0 will be added. So if name is 'document_' the first attachment is saved to 'attachment_0'."
+			}
+		]
 	}
 ]

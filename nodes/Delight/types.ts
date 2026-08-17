@@ -76,7 +76,33 @@ export interface DelightDeleteRecordsPayload extends IDataObject {
 
 export type DelightDeleteRecordsResponse = DelightApiResult<DelightDeleteRecordsPayload>
 
-export interface DelightQueryRecordResourceListPayload extends IDataObject {
-	documents?: JsonObject[]
-	directories?: JsonObject[]
+export interface DelightDocument extends IDataObject {
+	server_dbid: number
+	server_uid: string
+	name: string
+	size: number
+	lastmodified: string
+	createdate: string
+	version: string
 }
+
+export interface DelightQueryRecordResourceListPayload extends IDataObject {
+	documents?: DelightDocument[]
+	directories?: DelightQueryRecordResourceListPayload[]
+}
+
+export type DelightQueryRecordResourceListResponse =
+	DelightApiResult<DelightQueryRecordResourceListPayload>
+
+export interface DelightDownloadDocumentPayload extends IDataObject {
+	chunk: { position: number; size: number }
+	server_uid: string
+	name: string
+	lastmodified: string
+	createdate: string
+	converted: boolean
+	content: string
+	'content--encoding': string
+}
+
+export type DelightDownloadDocumentResponse = DelightApiResult<DelightDownloadDocumentPayload>

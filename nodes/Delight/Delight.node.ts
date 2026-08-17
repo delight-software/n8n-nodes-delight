@@ -70,7 +70,7 @@ export class Delight implements INodeType {
 		for (let i = 0; i < items.length; i++) {
 			try {
 				const resource = this.getNodeParameter('resource', i) as string
-				let responseData: JsonObject | JsonObject[]
+				let responseData: JsonObject | JsonObject[] | INodeExecutionData
 
 				switch (resource) {
 					case 'dataset':

@@ -9,6 +9,8 @@ import {
 import {
 	DelightAddRecordsPayload,
 	DelightDeleteRecordsPayload,
+	DelightDownloadDocumentPayload,
+	DelightQueryRecordResourceListPayload,
 	DelightQueryRecordsPayload,
 	DelightQuerySchemasPayload,
 	DelightSchema,
@@ -135,5 +137,37 @@ export async function addDocument(
 		'POST',
 		'/documentscenter/DocumentsInbox/AddDocuments',
 		data
+	)
+}
+
+export async function getRecordResourceList(
+	this: ThisContext,
+	containerUid: string,
+	schemaName: string,
+	recordUid: string,
+	pagination: JsonObject = { start: -1, count: -1 }
+): Promise<DelightQueryRecordResourceListPayload> {
+	const body = [containerUid, schemaName, recordUid, [], pagination]
+
+	return await delightApiRequest<DelightQueryRecordResourceListPayload>(
+		this,
+		'POST',
+		'/services/DocumentStore/QueryRecordResourceList',
+		body
+	)
+}
+
+export async function getDocument(
+	this: ThisContext,
+	documentUid: string,
+	format: string
+): Promise<DelightDownloadDocumentPayload> {
+	const body = [documentUid, { position: -1, size: -1 }, { format }]
+
+	return await delightApiRequest<DelightDownloadDocumentPayload>(
+		this,
+		'POST',
+		'/services/DocumentStore/DownloadDocumentEx',
+		body
 	)
 }
