@@ -6,10 +6,12 @@ async function getOptionsDatasetSchemas(
 ): Promise<INodePropertyOptions[]> {
 	const schemas = await getSchemas.call(this, [], false)
 
-	return schemas.map((field) => ({
-		value: field.name,
-		name: field.title
-	}))
+	return schemas
+		.map((field) => ({
+			value: field.name,
+			name: field.title
+		}))
+		.sort((a, b) => a.name.localeCompare(b.name))
 }
 
 async function getOptionsDatasetFields(
@@ -23,10 +25,12 @@ async function getOptionsDatasetFields(
 
 	const fields = await getSchemaFields.call(this, schema)
 
-	return fields.map((field) => ({
-		value: field.name,
-		name: field.title
-	}))
+	return fields
+		.map((field) => ({
+			value: field.name,
+			name: field.title
+		}))
+		.sort((a, b) => a.name.localeCompare(b.name))
 }
 
 async function getOptionsDatasetFilteredFields(
@@ -40,10 +44,12 @@ async function getOptionsDatasetFilteredFields(
 
 	const fields = await getFilteredSchemaFields.call(this, schema)
 
-	return fields.map((field) => ({
-		value: field.name,
-		name: field.title
-	}))
+	return fields
+		.map((field) => ({
+			value: field.name,
+			name: field.title
+		}))
+		.sort((a, b) => a.name.localeCompare(b.name))
 }
 
 export { getOptionsDatasetSchemas, getOptionsDatasetFields, getOptionsDatasetFilteredFields }
