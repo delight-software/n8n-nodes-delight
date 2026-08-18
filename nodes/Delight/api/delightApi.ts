@@ -12,7 +12,7 @@ import type {
 	IHookFunctions
 } from 'n8n-workflow'
 
-import { DelightApiResult } from '../types'
+import { DelightApiError, DelightApiResult } from '../types'
 import { NodeApiError } from 'n8n-workflow'
 
 interface CachedSession {
@@ -93,7 +93,7 @@ export async function getSessionKey(
 	return newSessionKey
 }
 
-function validateApiResponse(node: INode, response: DelightApiResult): boolean {
+function getValidatedPayload<T = IDataObject>(node: INode, response: DelightApiResult<T>): T {
 	const result = response?.result
 	if (!result) {
 		throw new NodeApiError(
@@ -125,7 +125,35 @@ function validateApiResponse(node: INode, response: DelightApiResult): boolean {
 		)
 	}
 
-	return true
+	const payload = result?.[1] as T & {
+		record_info?: Array<{ error?: DelightApiError }>
+	}
+
+	if (!payload) {
+		throw new NodeApiError(
+			node,
+			{ message: 'Something went wrong' },
+			{
+				message: 'Something went wrong',
+				description: 'Something went wrong. Please try later again.'
+			}
+		)
+	}
+
+	const recordInfo = payload.record_info
+
+	if (recordInfo && Array.isArray(recordInfo) && recordInfo.length > 0) {
+		const error = recordInfo[0]?.error
+
+		if (error) {
+			throw new NodeApiError(node, error, {
+				message: error.class || 'API Error',
+				description: error.message || ' An unkown error occurred'
+			})
+		}
+	}
+
+	return result?.[1]
 }
 
 export async function delightApiRequest<T = IDataObject>(
@@ -154,9 +182,7 @@ export async function delightApiRequest<T = IDataObject>(
 
 		try {
 			const response = await context.helpers.httpRequest(options)
-			validateApiResponse(context.getNode(), response)
-
-			return response.result[1]
+			return getValidatedPayload(context.getNode(), response)
 		} catch (error) {
 			const errorData = error?.response?.data
 
