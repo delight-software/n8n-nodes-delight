@@ -1,25 +1,8 @@
-import { IBinaryKeyData, IExecuteFunctions, INodeExecutionData } from 'n8n-workflow'
-import { getDocument, getRecordResourceList, getRecords } from '../../../api/events'
+import { IExecuteFunctions, INodeExecutionData } from 'n8n-workflow'
+import { getRecords } from '../../../api/events'
 import { getValidatedGlobalRecUid } from '../../../utils/validators'
 import { SCHEMAS_WITH_DOCUMENTS_SET, schemaUidMap } from '../../../constants/schemas'
-import { getFileExtension, getMimeTypeByExtension } from '../../../utils/fileUtils'
-import { DelightDocument, DelightQueryRecordResourceListPayload } from '../../../types'
-
-function extractAllDocuments(node: DelightQueryRecordResourceListPayload): DelightDocument[] {
-	const docs: DelightDocument[] = []
-
-	if (node?.documents && Array.isArray(node.documents)) {
-		docs.push(...node.documents)
-	}
-
-	if (node?.directories && Array.isArray(node.directories)) {
-		for (const dir of node.directories) {
-			docs.push(...extractAllDocuments(dir))
-		}
-	}
-
-	return docs
-}
+import { getBinaryDocuments } from '../../../utils/binaryUtils'
 
 export async function executeDatasetGet(
 	this: IExecuteFunctions,
@@ -60,32 +43,13 @@ export async function executeDatasetGet(
 		return { json }
 	}
 
-	const resources = await getRecordResourceList.call(this, schemaUid, schema, globalrecuid)
-	const documents = extractAllDocuments(resources || {})
-
-	if (documents.length === 0) {
-		return { json }
-	}
-
-	const files = await Promise.all(
-		documents.map((doc) => getDocument.call(this, doc.server_uid, getFileExtension(doc.name)))
+	const binaryData = await getBinaryDocuments.call(
+		this,
+		schemaUid,
+		schema,
+		globalrecuid,
+		documentPrefix
 	)
-
-	const binaryData: IBinaryKeyData = {}
-
-	for (const [index, file] of files.entries()) {
-		if (file.content) {
-			const fileExt = getFileExtension(file.name)
-
-			const binaryKey = documentPrefix + String(index)
-
-			binaryData[binaryKey] = await this.helpers.prepareBinaryData(
-				Buffer.from(file.content, 'base64'),
-				file.name,
-				getMimeTypeByExtension(fileExt)
-			)
-		}
-	}
 
 	return {
 		json,
