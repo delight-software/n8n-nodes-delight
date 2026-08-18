@@ -92,14 +92,18 @@ export class Delight implements INodeType {
 
 				returnData.push(...executionData)
 			} catch (error) {
+				error.message = `${error.message} (item ${i})`
 				if (this.continueOnFail()) {
 					returnData.push({
-						json: { error: (error as Error).message },
+						json: { error: error.message },
 						pairedItem: { item: i }
 					})
 					continue
 				}
-				throw new NodeOperationError(this.getNode(), error as JsonObject)
+				throw new NodeOperationError(this.getNode(), error as Error, {
+					description: error.description,
+					itemIndex: i
+				})
 			}
 		}
 
