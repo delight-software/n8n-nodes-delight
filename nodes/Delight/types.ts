@@ -3,7 +3,7 @@ import { IDataObject, JsonObject } from 'n8n-workflow'
 type DelightSchemaFieldType =
 	'String' | 'Integer' | 'Float' | 'DateTime' | 'Date' | 'Memo' | 'Image' | 'AutoInc' | 'Blob'
 
-interface DelightApiError extends JsonObject {
+export interface DelightApiError extends JsonObject {
 	class: string
 	message: string
 }
@@ -58,6 +58,7 @@ export type DelightAddRecordsResponse = DelightApiResult<DelightAddRecordsPayloa
 
 export interface DelightUpdateRecordInfo {
 	result: boolean
+	server_dbid?: number
 }
 
 export interface DelightUpdateRecordsPayload extends IDataObject {
