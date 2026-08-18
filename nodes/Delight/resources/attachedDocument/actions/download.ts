@@ -1,4 +1,4 @@
-import { IExecuteFunctions, INodeExecutionData } from 'n8n-workflow'
+import { IDataObject, IExecuteFunctions, INodeExecutionData } from 'n8n-workflow'
 import { getValidatedGlobalRecUid } from '../../../utils/validators'
 import { schemaUidMap } from '../../../constants/schemas'
 import { getBinaryDocuments } from '../../../utils/binaryUtils'
@@ -13,9 +13,11 @@ export async function executeAttachedDocumentDownload(
 		(this.getNodeParameter('options.documentPrefix', itemIndex, 'document_') as string) ||
 		'document_'
 
-	const json = {
+	const json: IDataObject = {
 		globalrecuid: recordId,
-		downloaded: false
+		downloaded: false,
+		documents_downloaded: 0,
+		documents: []
 	}
 
 	const schemaUid = schemaUidMap[schema]
@@ -24,7 +26,7 @@ export async function executeAttachedDocumentDownload(
 		return { json }
 	}
 
-	const binaryData = await getBinaryDocuments.call(
+	const { binaryData, metadata } = await getBinaryDocuments.call(
 		this,
 		schemaUid,
 		schema,
@@ -33,7 +35,10 @@ export async function executeAttachedDocumentDownload(
 	)
 
 	const binaryDataExists = !!Object.keys(binaryData).length
+
 	json.downloaded = binaryDataExists
+	json.documents_downloaded = metadata.length
+	json.documents = metadata
 
 	return {
 		json,
