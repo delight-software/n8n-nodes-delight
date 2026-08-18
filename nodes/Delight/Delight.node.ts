@@ -11,6 +11,8 @@ import { datasetFields, executeDataset } from './resources/dataset'
 import { documentsCenterFields, executeDocumentsCenter } from './resources/documents-center'
 import * as loadOptions from './methods/loadOptions'
 import * as resourceMapping from './methods/resourceMapping'
+import { attachedDocumentFields } from './resources/attachedDocument'
+import { executeAttachedDocument } from './resources/attachedDocument/execute'
 
 export class Delight implements INodeType {
 	description: INodeTypeDescription = {
@@ -49,12 +51,17 @@ export class Delight implements INodeType {
 					{
 						name: 'Documents Center',
 						value: 'documentsCenter'
+					},
+					{
+						name: 'Attached Document',
+						value: 'attachedDocument'
 					}
 				],
 				default: 'dataset'
 			},
 			...datasetFields,
-			...documentsCenterFields
+			...documentsCenterFields,
+			...attachedDocumentFields
 		]
 	}
 
@@ -79,6 +86,10 @@ export class Delight implements INodeType {
 
 					case 'documentsCenter':
 						responseData = await executeDocumentsCenter.call(this, i)
+						break
+
+					case 'attachedDocument':
+						responseData = await executeAttachedDocument.call(this, i)
 						break
 
 					default:

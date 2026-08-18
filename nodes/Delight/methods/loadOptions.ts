@@ -1,5 +1,6 @@
 import { ILoadOptionsFunctions, INodePropertyOptions } from 'n8n-workflow'
 import { getFilteredSchemaFields, getSchemaFields, getSchemas } from '../api/events'
+import { SCHEMAS_WITH_DOCUMENTS_SET } from '../constants/schemas'
 
 async function getOptionsDatasetSchemas(
 	this: ILoadOptionsFunctions
@@ -24,6 +25,13 @@ async function getOptionsDatasetSchemas(
 			}
 		})
 		.sort((a, b) => a.name.localeCompare(b.name))
+}
+
+async function getOptionsDatasetSchemasWithDocuments(
+	this: ILoadOptionsFunctions
+): Promise<INodePropertyOptions[]> {
+	const schemas = await getOptionsDatasetSchemas.call(this)
+	return schemas.filter((schema) => SCHEMAS_WITH_DOCUMENTS_SET.has(schema.value as string))
 }
 
 async function getOptionsDatasetFields(
@@ -64,4 +72,9 @@ async function getOptionsDatasetFilteredFields(
 		.sort((a, b) => a.name.localeCompare(b.name))
 }
 
-export { getOptionsDatasetSchemas, getOptionsDatasetFields, getOptionsDatasetFilteredFields }
+export {
+	getOptionsDatasetSchemas,
+	getOptionsDatasetSchemasWithDocuments,
+	getOptionsDatasetFields,
+	getOptionsDatasetFilteredFields
+}
