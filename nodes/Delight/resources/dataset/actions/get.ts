@@ -1,4 +1,4 @@
-import { IExecuteFunctions, INodeExecutionData } from 'n8n-workflow'
+import { IDataObject, IExecuteFunctions, INodeExecutionData } from 'n8n-workflow'
 import { getRecords } from '../../../api/events'
 import { getValidatedGlobalRecUid } from '../../../utils/validators'
 import { SCHEMAS_WITH_DOCUMENTS_SET, schemaUidMap } from '../../../constants/schemas'
@@ -21,6 +21,12 @@ export async function executeDatasetGet(
 		false
 	) as boolean
 
+	const includeDocumentMetadata = this.getNodeParameter(
+		'options.includeDocumentMetadata',
+		itemIndex,
+		false
+	) as boolean
+
 	const filters = [
 		{
 			fieldname: 'globalrecuid',
@@ -29,7 +35,7 @@ export async function executeDatasetGet(
 	]
 
 	const response = await getRecords.call(this, schema, filters, returnFields)
-	const json = response?.records?.[0] ?? {}
+	const json: IDataObject = response?.records?.[0] ?? {}
 
 	const schemaUid = schemaUidMap[schema]
 	const globalrecuid = json.globalrecuid as string
@@ -43,13 +49,17 @@ export async function executeDatasetGet(
 		return { json }
 	}
 
-	const binaryData = await getBinaryDocuments.call(
+	const { binaryData, metadata } = await getBinaryDocuments.call(
 		this,
 		schemaUid,
 		schema,
 		globalrecuid,
 		documentPrefix
 	)
+
+	if (includeDocumentMetadata) {
+		json.documents = metadata
+	}
 
 	return {
 		json,

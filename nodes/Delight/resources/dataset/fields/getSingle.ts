@@ -39,6 +39,14 @@ export const datasetGetSingleFields: INodeProperties[] = [
 				description: 'Whether the documents will be downloaded and included in the output'
 			},
 			{
+				displayName: 'Include Document Metadata',
+				name: 'includeDocumentMetadata',
+				type: 'boolean',
+				default: false,
+				description:
+					'Whether to include document details, such as folder paths and file names, in the JSON output'
+			},
+			{
 				displayName: 'Document Prefix',
 				name: 'documentPrefix',
 				type: 'string',
