@@ -49,7 +49,7 @@ export class Delight implements INodeType {
 						value: 'dataset'
 					},
 					{
-						name: 'Documents Center',
+						name: 'Document Center Inbox',
 						value: 'documentsCenter'
 					},
 					{
