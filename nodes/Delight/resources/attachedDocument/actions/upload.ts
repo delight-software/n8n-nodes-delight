@@ -2,6 +2,14 @@ import { IExecuteFunctions, JsonObject } from 'n8n-workflow'
 import { updateRecord } from '../../../api/events'
 import { getValidatedGlobalRecUid } from '../../../utils/validators'
 
+type UpdateRecordPaylaod = {
+	name: string
+	content: string
+	'content--encoding': 'Base64'
+	path?: string
+	remote_uid?: string
+}
+
 export async function executeAttachedDocumentUpload(
 	this: IExecuteFunctions,
 	itemIndex: number
@@ -9,6 +17,10 @@ export async function executeAttachedDocumentUpload(
 	const recordId = getValidatedGlobalRecUid(this, 'recordId', itemIndex)
 	const schema = this.getNodeParameter('schema', itemIndex) as string
 	const uploadAll = this.getNodeParameter('uploadAll', itemIndex, true) as boolean
+	const path = this.getNodeParameter('options.path', itemIndex, '') as string
+
+	const executionId = this.getExecutionId() ?? 'manual'
+	const workflowId = this.getWorkflow().id ?? 'unsaved'
 
 	let binaryPropertyNames: string[] = []
 
@@ -38,11 +50,18 @@ export async function executeAttachedDocumentUpload(
 		const buffer = await this.helpers.getBinaryDataBuffer(itemIndex, binaryData)
 		const base64 = buffer.toString('base64')
 
-		insertPayload.push({
+		const payload = {
+			remote_uid: `n8n_wf_${workflowId}_exec_${executionId}_item_${itemIndex}_${propertyName}`,
 			name: binaryData.fileName || 'uploaded_document',
 			'content--encoding': 'Base64',
 			content: base64
-		})
+		} as UpdateRecordPaylaod
+
+		if (path) {
+			payload.path = path
+		}
+
+		insertPayload.push(payload)
 	}
 
 	const payload = {

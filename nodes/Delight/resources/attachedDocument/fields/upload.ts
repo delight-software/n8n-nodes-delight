@@ -30,5 +30,25 @@ export const attachedDocumentUploadFields: INodeProperties[] = [
 		},
 		description:
 			'Name of the binary property containing the file to upload. To process multiple properties, separate them with a comma (e.g. data_0,data_1).'
+	},
+	{
+		displayName: 'Options',
+		name: 'options',
+		type: 'collection',
+		placeholder: 'Add Option',
+		default: {},
+		displayOptions: {
+			show: showOnlyForDocumentUpload
+		},
+		options: [
+			{
+				displayName: 'Folder Path',
+				name: 'path',
+				type: 'string',
+				default: '',
+				description:
+					'The destination path where the documents will be saved. Separate nested folders with a comma (e.g., MainFolder,SubFolder).'
+			}
+		]
 	}
 ]
