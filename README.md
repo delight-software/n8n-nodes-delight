@@ -30,7 +30,7 @@ After installation:
 
 The package includes three node types:
 
-- **Delight Actions**: read, create, update, and delete CRM records; upload documents.
+- **Delight Actions**: read, create, update, and delete CRM records; upload documents to the document center inbox or to specific records.
 - **Delight Polling Trigger**: poll for new or updated records on a schedule.
 - **Delight Webhook Trigger**: receive instant webhook events for record changes.
 
@@ -49,13 +49,22 @@ The package includes three node types:
 
 Dataset operations require selecting a schema. The node loads available schemas and fields dynamically from the delight API. For **Get Many**, the node supports grouped filter conditions with logical operators (`AND` / `OR`), comparisons (`=`, `!=`, `>`, `>=`, `<`, `<=`, `LIKE`), and optional result limiting.
 
-#### Documents Center
+#### Document Center Inbox
 
-| Operation       | Description                                                         |
-| --------------- | ------------------------------------------------------------------- |
-| Upload Document | Upload an email or binary document to the delight Documents Center. |
+| Operation       | Description                                                        |
+| --------------- | ------------------------------------------------------------------ |
+| Upload Document | Upload an email or binary document to the delight Document Center. |
 
 When uploading an email, the node normalises incoming n8n email payloads and sends them as `.eml` documents. Supports reply/archive processing, auto-assignment by sender, and configurable metadata (display name, origin, document class, message type).
+
+#### Attached Document
+
+| Operation | Description                                                    |
+| --------- | -------------------------------------------------------------- |
+| Upload    | Upload documents and attach them to a specific CRM record.     |
+| Download  | Download documents that are attached to a specific CRM record. |
+
+The Attached Document resource allows you to manage documents linked to individual records within a dataset. Upload documents to attach them to existing records, or download documents already attached to records.
 
 ### Delight Polling Trigger
 
@@ -123,12 +132,20 @@ No minimum n8n version beyond the 1.x line is known to be required. If you encou
 3. Transform data in n8n
 4. **Delight Actions** → Dataset → Create or Update → write results back
 
-### Example: archive incoming emails to the Documents Center
+### Example: archive incoming emails to the Document Center Inbox
 
 1. **Gmail** / **IMAP Email Trigger** / **Microsoft Outlook** node
-2. **Delight Actions** → Documents Center → Upload Document → Document Class: Email, Message Type: Automatic
+2. **Delight Actions** → Document Center Inbox → Upload Document → Document Class: Email, Message Type: Automatic
 
-The Documents Center operation normalises the email payload from any supported source node automatically.
+The Document Center Inbox operation normalises the email payload from any supported source node automatically.
+
+### Example: attach a document to a CRM record
+
+1. **File trigger** or **HTTP request** to receive a document
+2. **Delight Actions** → Attached Document → Upload → select schema, provide record ID
+3. Map the file content to the upload operation
+
+The attached document will be linked to the specified CRM record.
 
 ## Resources
 
