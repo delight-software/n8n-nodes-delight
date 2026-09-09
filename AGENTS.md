@@ -100,3 +100,10 @@ regarding building community nodes:
 - https://docs.n8n.io/integrations/creating-nodes/overview/
 - https://docs.n8n.io/integrations/creating-nodes/build/reference/
 - https://docs.n8n.io/integrations/creating-nodes/build/reference/ux-guidelines/
+
+## Fachliche Dokumentation
+
+- Vor Funktionsänderungen, fachlicher Analyse oder Website-Aussagen [docs/funktionsumfang-und-abgrenzung.md](docs/funktionsumfang-und-abgrenzung.md) lesen. Sie enthält die gepflegten Funktionen, Grenzen und Quellanker.
+- Bei relevanten Änderungen die Fachreferenz und den geprüften Quellenstand in `docs/source-review.json` im selben Auftrag mitpflegen. Unveränderte oder ungeprüfte Bereiche nicht als neu geprüft ausgeben.
+- Für Dokumentationsaktualisierungen den gemeinsamen Skill `delightbase-web-product-docs` verwenden, sofern verfügbar. Im benachbarten Core-Checkout liegt er unter `.agents/skills/delightbase-web-product-docs/SKILL.md`; die lokale Fachreferenz bleibt auch ohne diesen Checkout nutzbar.
+- Die zentrale Website-Sicht unter `core/docs/website-modules` wird daraus abgeleitet. Ihre stabile ID beibehalten; bei fachlichen Änderungen die Übergabe aktualisieren oder einen ausstehenden Abgleich benennen. Keine automatische Veröffentlichung oder Änderung der Produkt-/Editionszuordnung.

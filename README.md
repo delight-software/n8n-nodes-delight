@@ -1,5 +1,9 @@
 # n8n-nodes-delight
 
+## Fachliche Referenz
+
+[Funktionsumfang und Abgrenzung](docs/funktionsumfang-und-abgrenzung.md) beschreibt Funktionen, Abläufe, Voraussetzungen und belegte Grenzen. [Quellenstand](docs/source-review.json) dokumentiert die geprüften Dateien. Diese Referenz ist die fachliche Grundlage für Entwicklung und die abgeleitete Website-Dokumentation.
+
 This is an n8n community node. It lets you use **delight CRM** in your n8n workflows.
 
 delight CRM is a business software platform by delight GmbH that provides flexible, all-in-one business solutions including CRM datasets, document management, and event-driven data handling.

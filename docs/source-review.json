@@ -1,0 +1,36 @@
+{
+  "reviewedAt": "2026-09-09",
+  "capabilityId": "n8n",
+  "sourceCommit": "31dbb6100df49ee738b129d2c2e679b840a64a3b",
+  "sourceWorkingTreeStatus": "README.md contains reviewed documentation links added during migration; implementation source files unchanged.",
+  "pathBase": "repository root",
+  "method": "Transferred source review from core; listed source bytes verified unchanged. Binary dlbmod: embedded form/schema text inspection only. No runtime tests.",
+  "files": [
+    {
+      "path": "nodes/Delight/resources/attachedDocument/execute.ts",
+      "sha256": "f0e82f9d86adf24ccb989bd7c00e7908cd461ebdff102b3ea3fbe836bfd74145"
+    },
+    {
+      "path": "nodes/Delight/resources/dataset/execute.ts",
+      "sha256": "e3e68fdb24c498fc97c9c3231a913e4eec7ff8e535117dc121500bbb8e9cc4b0"
+    },
+    {
+      "path": "nodes/Delight/resources/documents-center/actions/create.ts",
+      "sha256": "2ba9f8292a8cf156def14b932f33c962df53dfe1f2031fc964bee7d1faca95f0"
+    },
+    {
+      "path": "nodes/Delight/resources/trigger/fields.ts",
+      "sha256": "c6b3b82c28fcdf89a11d19987ecaf7414218e52be5045f639cee46d0b7f581ef"
+    },
+    {
+      "path": "nodes/Delight/resources/trigger/webhookMethods.ts",
+      "sha256": "6cf05ac0888ef2144ed72c2ef983ac68701c4abf7d73f6e6a7fb8313f1a6638b"
+    },
+    {
+      "path": "README.md",
+      "sha256": "8ae651c4e8ed7250c97105cc713750bb40ba212430e2f22b1455bee9716ff6df",
+      "previousSha256": "bc938542a4608a09e988aab2e76b9c75ba690f38cbab50911109ef8d92d09a85",
+      "reviewNote": "Documentation-only change reviewed: added links to local functional reference and source review; existing feature and setup text retained."
+    }
+  ]
+}
