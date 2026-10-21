@@ -24,10 +24,9 @@ export const datasetGetManyFields: INodeProperties[] = [
 			{
 				name: 'filter',
 				displayName: 'Filter',
-				// eslint-disable-next-line n8n-nodes-base/node-param-fixed-collection-type-unsorted-items
 				values: [
 					{
-						displayName: 'Logical Operator',
+						displayName: '1. Logical Operator',
 						name: 'logicalOperator',
 						type: 'options',
 						options: [
@@ -47,7 +46,7 @@ export const datasetGetManyFields: INodeProperties[] = [
 							'How to combine this filter with the previous one. Ignored for the first filter.'
 					},
 					{
-						displayName: 'Open Group',
+						displayName: '2. Open Group',
 						name: 'openGroup',
 						type: 'boolean',
 						default: false,
@@ -55,7 +54,7 @@ export const datasetGetManyFields: INodeProperties[] = [
 							'Whether to add a "(" before this condition to group it with subsequent conditions'
 					},
 					{
-						displayName: 'Field Name or ID',
+						displayName: '3. Field Name or ID',
 						name: 'fieldName',
 						type: 'options',
 						typeOptions: {
@@ -66,7 +65,7 @@ export const datasetGetManyFields: INodeProperties[] = [
 							'The dataset field to filter by. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.'
 					},
 					{
-						displayName: 'Filter Type',
+						displayName: '4. Filter Type',
 						name: 'filterType',
 						type: 'options',
 						options: [
@@ -82,14 +81,14 @@ export const datasetGetManyFields: INodeProperties[] = [
 						description: 'The comparison operator to apply'
 					},
 					{
-						displayName: 'Value',
+						displayName: '5. Value',
 						name: 'value',
 						type: 'string',
 						default: '',
 						description: 'The value to compare against. Use an expression for dynamic values.'
 					},
 					{
-						displayName: 'Close Group',
+						displayName: '6. Close Group',
 						name: 'closeGroup',
 						type: 'boolean',
 						default: false,
