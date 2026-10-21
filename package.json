@@ -4,13 +4,16 @@
   "description": "delight business software products are powerfull and very flexible all in one business solutions.",
   "homepage": "https://www.delight.ch/",
   "license": "MIT",
-  "private": true,
   "keywords": [
     "n8n-community-node-package"
   ],
   "author": {
     "name": "delight",
     "email": "info@delight.ch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/delight-software/n8n-nodes-delight.git"
   },
   "scripts": {
     "build": "n8n-node build",
@@ -37,11 +40,11 @@
     ]
   },
   "devDependencies": {
-    "@n8n/node-cli": "*",
-    "@types/node": "^26.2.0",
+    "@n8n/node-cli": "^0.53.3",
+    "@types/node": "^26.6.5",
     "eslint": "9.29.0",
-    "prettier": "3.9.6",
-    "release-it": "^21.0.2",
+    "prettier": "3.9.10",
+    "release-it": "^21.1.1",
     "typescript": "6.0.2"
   },
   "peerDependencies": {
