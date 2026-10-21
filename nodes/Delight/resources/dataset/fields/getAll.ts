@@ -69,15 +69,14 @@ export const datasetGetManyFields: INodeProperties[] = [
 						displayName: 'Filter Type',
 						name: 'filterType',
 						type: 'options',
-						// eslint-disable-next-line n8n-nodes-base/node-param-options-type-unsorted-items
 						options: [
+							{ name: 'Contains (Like)', value: 'LIKE' },
 							{ name: 'Equals (=)', value: 'eq' },
-							{ name: 'Not Equals (!=)', value: '<>' },
 							{ name: 'Greater Than (>)', value: '>' },
 							{ name: 'Greater Than or Equal (>=)', value: '>=' },
 							{ name: 'Less Than (<)', value: '<' },
 							{ name: 'Less Than or Equal (<=)', value: '<=' },
-							{ name: 'Contains (Like)', value: 'LIKE' }
+							{ name: 'Not Equals (!=)', value: '<>' }
 						],
 						default: 'eq',
 						description: 'The comparison operator to apply'
