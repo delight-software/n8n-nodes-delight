@@ -101,9 +101,9 @@ regarding building community nodes:
 - https://docs.n8n.io/integrations/creating-nodes/build/reference/
 - https://docs.n8n.io/integrations/creating-nodes/build/reference/ux-guidelines/
 
-## Fachliche Dokumentation
+## Functional documentation
 
-- Vor Funktionsänderungen, fachlicher Analyse oder Website-Aussagen [docs/funktionsumfang-und-abgrenzung.md](docs/funktionsumfang-und-abgrenzung.md) lesen. Sie enthält die gepflegten Funktionen, Grenzen und Quellanker.
-- Bei relevanten Änderungen die Fachreferenz und den geprüften Quellenstand in `docs/source-review.json` im selben Auftrag mitpflegen. Unveränderte oder ungeprüfte Bereiche nicht als neu geprüft ausgeben.
-- Für Dokumentationsaktualisierungen den gemeinsamen Skill `delightbase-web-product-docs` verwenden, sofern verfügbar. Im benachbarten Core-Checkout liegt er unter `.agents/skills/delightbase-web-product-docs/SKILL.md`; die lokale Fachreferenz bleibt auch ohne diesen Checkout nutzbar.
-- Die zentrale Website-Sicht unter `core/docs/website-modules` wird daraus abgeleitet. Ihre stabile ID beibehalten; bei fachlichen Änderungen die Übergabe aktualisieren oder einen ausstehenden Abgleich benennen. Keine automatische Veröffentlichung oder Änderung der Produkt-/Editionszuordnung.
+- Before changing functionality, analyzing functional behavior, or making website claims, read [docs/features-and-scope.md](docs/features-and-scope.md). It contains the maintained features, limitations, and source references.
+- For relevant changes, update the functional reference and the reviewed source state in `docs/source-review.json` as part of the same task. Do not present unchanged or unreviewed areas as newly reviewed.
+- For documentation updates, use the shared `delightbase-web-product-docs` skill if available. It is located at `.agents/skills/delightbase-web-product-docs/SKILL.md` in the neighboring Core checkout; the local functional reference remains usable without that checkout.
+- The central website overview under `core/docs/website-modules` is derived from this reference. Preserve its stable ID; when functionality changes, update the handoff or identify any pending reconciliation. Do not automatically publish or change product/edition assignments.

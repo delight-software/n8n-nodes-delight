@@ -1,8 +1,8 @@
 # n8n-nodes-delight
 
-## Fachliche Referenz
+## Functional Reference
 
-[Funktionsumfang und Abgrenzung](docs/funktionsumfang-und-abgrenzung.md) beschreibt Funktionen, Abläufe, Voraussetzungen und belegte Grenzen. [Quellenstand](docs/source-review.json) dokumentiert die geprüften Dateien. Diese Referenz ist die fachliche Grundlage für Entwicklung und die abgeleitete Website-Dokumentation.
+[Features and Scope](docs/features-and-scope.md) describes the node's functionality, workflows, prerequisites, and documented limitations. [Source Review](docs/source-review.json) records the files reviewed and verified. This reference serves as the functional foundation for development and the derived website documentation.
 
 This is an n8n community node. It lets you use **delight CRM** in your n8n workflows.
 
