@@ -32,5 +32,79 @@
       "previousSha256": "bc938542a4608a09e988aab2e76b9c75ba690f38cbab50911109ef8d92d09a85",
       "reviewNote": "Documentation-only change reviewed: added links to local functional reference and source review; existing feature and setup text retained."
     }
+  ],
+  "partialReviews": [
+    {
+      "reviewedAt": "2026-10-21",
+      "scope": "Credential-managed session authentication targeting n8n 2.44.5",
+      "sourceCommit": "85c7e978eecb1a8eb3ca39479770ad63a4396a3e",
+      "sourceWorkingTreeStatus": "Reviewed uncommitted authentication implementation, tests, CI, and scoped documentation changes. Existing filter-builder edits were preserved and are outside this review.",
+      "method": "Current-source review plus automated execution of authentication modules from integrity-pinned published n8n 2.44.5 and its n8n-core 2.44.3 dependency, with simulated credential storage and HTTP transport.",
+      "validation": [
+        "npm run test:auth: build and 39 tests passed, no skipped tests.",
+        "npm run lint: passed with the existing filter-order suppression retained.",
+        "tsc --noEmit --incremental false: passed.",
+        "ESLint on credentials, nodes, and package.json with allowInlineConfig=false: only the existing filter-order violation remains; no manual-auth or credential-masking violations.",
+        "git diff --check: passed."
+      ],
+      "limitations": [
+        "No live Delight API, full n8n editor, database encryption/persistence integration, or production deployment validation.",
+        "Concurrent-session reuse and HTTP 401 expiration behavior were confirmed by the product owner and modeled by the simulated API.",
+        "Credential tests require permission to query schemas.",
+        "The published-package scanner was not rerun against these unpublished working-tree changes."
+      ],
+      "websiteHandoff": {
+        "capabilityId": "n8n",
+        "status": "pending",
+        "scope": "Reconcile authentication prerequisites and the n8n 2.44.5 target; no publication or product/edition assignment changes."
+      },
+      "files": [
+        {
+          "path": "credentials/DelightApi.credentials.ts",
+          "sha256": "7d79e1b1d9a6c5c818e5cf1d633c495b20985c2aeb31788665bf02d85c5b97b0",
+          "reviewNote": "Reviewed login payload, response and 2FA checks, credential-managed session fields, SESSIONKEY injection, and authenticated credential test."
+        },
+        {
+          "path": "nodes/Delight/api/delightApi.ts",
+          "sha256": "2c655c1615e8062ad90d4efabc9880c8648215c0675e2720966cc10d2257f508",
+          "reviewNote": "Reviewed removal of the manual session cache and retry loop, configuration invalidation, authenticated helper delegation, and unchanged application response validation."
+        },
+        {
+          "path": "nodes/Delight/api/sessionConfiguration.ts",
+          "sha256": "bd3f3f7ca76316f2749e10d233a9ce90c21b9788b6482b5551dc22bdd708f1e2",
+          "reviewNote": "Reviewed SHA-256 binding of the session to endpoint, username, and password without storing another plaintext copy."
+        },
+        {
+          "path": "test/authentication.test.cjs",
+          "sha256": "dabdc1bf3792df4b32a12dca2d67d7e7db31d24777c17ec61a001b699dcb6e9a",
+          "reviewNote": "39 passing authentication regression tests; production entry points use real n8n authentication modules with simulated transport and storage."
+        },
+        {
+          "path": "test/helpers/n8n-runtime.cjs",
+          "sha256": "9bf6cc4e56ae2374b8c93e60dcf0710d4d28e77182bdd20b7e133e68aa017260",
+          "reviewNote": "Reviewed integrity-pinned n8n 2.44.5 and n8n-core 2.44.3 archive loading, real authentication modules, and substituted service boundaries."
+        },
+        {
+          "path": "package.json",
+          "sha256": "dd1a63c41f961af83d667ec65b0ac34bb9bb97b7604a63eb128a8283b7e7b812",
+          "reviewNote": "Only the test:auth script was added; package version, runtime dependencies, peer dependency, and node/credential registration paths are unchanged."
+        },
+        {
+          "path": ".github/workflows/ci.yml",
+          "sha256": "3d51068806860ffbdec35c5eb088aa153a69a11419fac287550ef98702f1b6f9",
+          "reviewNote": "Added authentication tests after the existing build."
+        },
+        {
+          "path": "README.md",
+          "sha256": "d3d0b70220ca7b17e9d737a7891fea1ce4736be4f1ae9fc6e643012edaa2543c",
+          "reviewNote": "Authentication, target n8n version, test instructions, and validation boundaries only."
+        },
+        {
+          "path": "docs/features-and-scope.md",
+          "sha256": "be05e51c0f74273f07013422a50bf2a71b92fb0677cb7b7a47f02b86ffa898c0",
+          "reviewNote": "Authentication-only functional update; prior review dates retained for other capabilities; central website handoff marked pending."
+        }
+      ]
+    }
   ]
 }
