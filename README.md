@@ -108,13 +108,21 @@ The node uses a credential of type **delight API**.
 
 ### Authentication behaviour
 
-The node authenticates by calling the delight login endpoint and caches the returned session key. All subsequent API calls send this key in the `SESSIONKEY` request header. The credential test validates authentication against the delight login endpoint before the credential is saved.
+The credential logs in to the delight API and stores the returned session key as hidden, sensitive credential data managed by n8n. Subsequent requests send the key in the `SESSIONKEY` header. A change to the REST API URL, username, or password requires a fresh login before the nodes send another API request.
+
+n8n refreshes the session after HTTP 401 and retries the API request once. There is no additional retry loop or time-based session expiry in this package. Accounts requiring two-factor authentication are not supported.
+
+The credential test performs the same login, including the two-factor authentication check, followed by an authenticated schema query. The account must have permission to query schemas. Existing `delightApi` credentials and workflow parameter names remain valid.
 
 ## Compatibility
 
-Tested against **n8n 1.x**. The node targets `n8nNodesApiVersion: 1` and runs in strict mode.
+The authentication implementation targets **n8n 2.44.5**. Compatibility with n8n 1.x is no longer a target. The package retains `n8nNodesApiVersion: 1` and strict mode; that API version is separate from the n8n application version.
 
-No minimum n8n version beyond the 1.x line is known to be required. If you encounter compatibility issues with a specific version, please open an issue in the repository.
+Automated tests exercise the authentication modules shipped with n8n 2.44.5, using a simulated credential store and API transport. This does not establish live Delight API or full n8n editor/deployment validation.
+
+### Authentication tests
+
+Run `npm run test:auth` to build and execute the authentication regression tests. The first run downloads integrity-pinned `n8n@2.44.5` and its `n8n-core@2.44.3` npm archives to the OS temporary directory. Later runs reuse the verified archives. The tests require Node.js, `tar`, and first-run access to the npm registry; they do not need a Delight account or running n8n server.
 
 ## Usage
 
