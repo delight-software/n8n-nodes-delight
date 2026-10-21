@@ -13,7 +13,9 @@
 #
 #   npm list @n8n/node-cli
 #
-# To upgrade, add @n8n/node-cli@latest as a dev dependency using your package manager.
+# To upgrade:
+#
+#   npm install --save-dev @n8n/node-cli@latest
 #
 # ─── ONE-TIME SETUP ────────────────────────────────────────────────────────────
 #
@@ -82,7 +84,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: 'npm ci'
+        run: npm ci
 
       - name: Release
         # Publishes to npm with a provenance attestation (requires id-token: write above).
@@ -96,4 +98,4 @@ jobs:
           [ -n "$NPM_TOKEN" ] && npm config set //registry.npmjs.org/:_authToken "$NPM_TOKEN"
           npm run release
         env:
-          NPM_TOKEN: $
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
