@@ -29,8 +29,7 @@ export class DelightPollingTrigger implements INodeType {
 				required: true
 			}
 		],
-		properties: pollingTriggerFields,
-		usableAsTool: true
+		properties: pollingTriggerFields
 	}
 
 	methods = {

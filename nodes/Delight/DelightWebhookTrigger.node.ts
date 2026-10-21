@@ -37,8 +37,7 @@ export class DelightWebhookTrigger implements INodeType {
 				required: true
 			}
 		],
-		properties: webhookTriggerFields,
-		usableAsTool: true
+		properties: webhookTriggerFields
 	}
 
 	methods = {
