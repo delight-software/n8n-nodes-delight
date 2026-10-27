@@ -25,9 +25,10 @@ type ThisContext = ILoadOptionsFunctions | IExecuteFunctions | IPollFunctions | 
 export async function getSchemas(
 	this: ThisContext,
 	schemaNames: string[],
-	includeFields: boolean = true,
-	language: string = 'german'
+	includeFields: boolean = true
 ): Promise<DelightSchema[]> {
+	const credentials = await this.getCredentials('delightApi')
+	const language = credentials.labelLanguage || 'english'
 	const response = await delightApiRequest<DelightQuerySchemasPayload>(
 		this,
 		'POST',
@@ -40,10 +41,9 @@ export async function getSchemas(
 
 export async function getSchemaFields(
 	this: ThisContext,
-	schemaName: string,
-	language: string = 'german'
+	schemaName: string
 ): Promise<DelightSchemaField[]> {
-	const schemas = await getSchemas.call(this, [schemaName], true, language)
+	const schemas = await getSchemas.call(this, [schemaName], true)
 	const schema = schemas.find((s) => s.name === schemaName)
 
 	return schema?.fields ?? []
@@ -51,10 +51,9 @@ export async function getSchemaFields(
 
 export async function getFilteredSchemaFields(
 	this: ThisContext,
-	schemaName: string,
-	language: string = 'german'
+	schemaName: string
 ): Promise<DelightSchemaField[]> {
-	const fields = await getSchemaFields.call(this, schemaName, language)
+	const fields = await getSchemaFields.call(this, schemaName)
 
 	return fields.filter(
 		(field) => !FORBIDDEN_TYPES.has(field.type) && !FORBIDDEN_NAMES.has(field.name)

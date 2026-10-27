@@ -60,6 +60,18 @@ export class DelightApi implements ICredentialType {
 			typeOptions: { password: true },
 			default: '',
 			required: true
+		},
+		{
+			displayName: 'Label Language',
+			name: 'labelLanguage',
+			type: 'options',
+			options: [
+				{ name: 'English', value: 'english' },
+				{ name: 'German', value: 'german' }
+			],
+			default: 'english',
+			description:
+				'Language used for schema and field labels displayed in n8n. Internal names and record values are not affected.'
 		}
 	]
 
@@ -119,7 +131,7 @@ export class DelightApi implements ICredentialType {
 			baseURL: '={{$credentials.restApiUrl.replace(/[/]$/, "")}}',
 			url: '/database/schema/QuerySchemas',
 			method: 'POST',
-			body: [[], false, 'german'],
+			body: [[], false, '={{$credentials.labelLanguage}}'],
 			json: true
 		},
 		rules: [
