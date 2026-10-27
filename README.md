@@ -68,7 +68,9 @@ When uploading an email, the node normalises incoming n8n email payloads and sen
 | Upload    | Upload documents and attach them to a specific CRM record.     |
 | Download  | Download documents that are attached to a specific CRM record. |
 
-The Attached Document resource allows you to manage documents linked to individual records within a dataset. Upload documents to attach them to existing records, or download documents already attached to records.
+Attached Document operations support a predefined set of schemas. The schema dropdown shows supported schemas available to the selected account; availability depends on installed delight modules and permissions.
+
+Dataset **Get → Download Documents** can also retrieve linked documents for supported schemas. If an unsupported schema is supplied through an expression or an existing workflow, Dataset Get returns the record without documents, while Attached Document Download reports `downloaded: false` and an empty document list. An empty result can also mean that the record has no downloadable documents.
 
 ### Delight Polling Trigger
 
@@ -100,6 +102,13 @@ The node uses a credential of type **delight API**.
 | REST API URL | Yes      | Base URL of the delight REST API.          |
 | Username     | Yes      | delight CRM username used to authenticate. |
 | Password     | Yes      | Password for the delight CRM user.         |
+| Label Language | No | Schema and field display language: English (default) or German. |
+
+### Display language
+
+**Label Language** defaults to **English**, including for existing credentials without this setting. Choose **German** to use the delight CRM labels familiar to German-speaking users. The setting applies to schema and field metadata in the action node, resource mapper, both trigger nodes, and the credential test. Static n8n labels and descriptions remain in English.
+
+Only display labels are localized. Schema names, field identifiers, record values, filters, and saved workflow mappings are unchanged. Changing the label language does not change the authentication session fingerprint. Save the credential and refresh the relevant options or mapper fields to load updated labels; existing saved labels may remain visible until refreshed. Translations are supplied by the delight API; the package does not translate customer-defined labels itself.
 
 ### Where to find these values
 
@@ -120,9 +129,13 @@ The authentication implementation targets **n8n 2.44.5**. Compatibility with n8n
 
 Automated tests exercise the authentication modules shipped with n8n 2.44.5, using a simulated credential store and API transport. This does not establish live Delight API or full n8n editor/deployment validation.
 
-### Authentication tests
+### Regression tests
 
-Run `npm run test:auth` to build and execute the authentication regression tests. The first run downloads integrity-pinned `n8n@2.44.5` and its `n8n-core@2.44.3` npm archives to the OS temporary directory. Later runs reuse the verified archives. The tests require Node.js, `tar`, and first-run access to the npm registry; they do not need a Delight account or running n8n server.
+Run `npm test` to build and execute all regression tests.
+
+Tests are organized by authentication and credentials, node execution and triggers, dynamic metadata and codex identifiers, and document operations. They share the existing API/credential test harness.
+
+The first run downloads integrity-pinned `n8n@2.44.5` and `n8n-core@2.44.3` npm archives to the OS temporary directory. Later runs reuse the verified archives. The tests require Node.js, `tar`, and first-run access to the npm registry; they do not need a delight account or running n8n server. Simulated API responses verify package behavior, not live API behavior or cross-installation compatibility.
 
 ## Usage
 
@@ -169,3 +182,9 @@ The attached document will be linked to the specified CRM record.
 ## Version history
 
 See [CHANGELOG.md](CHANGELOG.md)
+
+## Release maintenance
+
+GitLab is the primary repository. For tag-triggered synchronization to GitHub
+and the existing GitHub Actions publisher, see the
+[release synchronization setup and recovery guide](docs/gitlab-github-sync.md).

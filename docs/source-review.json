@@ -105,6 +105,302 @@
           "reviewNote": "Authentication-only functional update; prior review dates retained for other capabilities; central website handoff marked pending."
         }
       ]
+    },
+    {
+      "reviewedAt": "2026-10-26",
+      "scope": "Verification remediation: metadata display language, fixed document mappings, codex identifiers, and unused request defaults",
+      "sourceCommit": "563e91bc191a759680de3172e54922514679eb05",
+      "sourceWorkingTreeStatus": "Reviewed focused uncommitted implementation, test, and English documentation changes; package version and dependency declarations unchanged.",
+      "method": "Current-source review and 56 automated tests using integrity-pinned n8n 2.44.5/n8n-core 2.44.3 authentication modules, the installed n8n-workflow 2.44.2 defaults/expression evaluator, and simulated storage/API transport. Inspected generated metadata and an unpublished npm archive. Fixed cross-installation document identities are a product-owner-confirmed invariant, not independently proven by the tests.",
+      "validation": [
+        "npm run test:auth: build and all 56 tests passed; no skipped tests. Final standard command run outside the sandbox after its subprocess/archive-loading limitations prevented completion.",
+        "npm run lint: passed outside the sandbox; sandbox attempt failed traversing its unavailable synthetic .aws directory. No lint configuration changes.",
+        "tsc --noEmit --incremental false: passed.",
+        "ESLint with --no-inline-config on nodes, credentials, and package.json: passed.",
+        "Prettier check of the extended test file using existing formatting conventions: passed.",
+        "npm pack --dry-run --ignore-scripts and local npm pack --ignore-scripts: passed. Inspected 148 archive entries, all registered node/credential entry points, README, compiled language selection and requestDefaults removal, and all three source/generated/archived codex identifiers. Version remains 1.0.5.",
+        "Confirmed all document mapping values, the shared HTTP helper, and the session fingerprint source unchanged against HEAD; JSON metadata differs only in node identifiers.",
+        "Local documentation links checked; existing unavailable Core overview link retained.",
+        "git diff --check: passed."
+      ],
+      "limitations": [
+        "No live Delight API, real server English/German translation verification, full n8n editor refresh/persistence, or production/deployment validation.",
+        "Fixed container/schema mappings and intentional POLICY UID sharing confirmed by the product owner. Backend container registrations/API contracts covering supported versions and representative separate-installation results remain needed for independent evidence and explicit n8n reviewer acceptance.",
+        "Existing unsupported-schema behavior retained: Dataset Get skips documents; Attached Document Download returns an empty result without a document request. This can be mistaken for a supported record with no documents.",
+        "No package publication, release, version change, push, or registry-package scan. Local validation does not establish n8n verification acceptance."
+      ],
+      "websiteHandoff": {
+        "capabilityId": "n8n",
+        "status": "pending",
+        "scope": "Reconcile configurable display language and linked-document schema support/limitations; retain prior authentication handoff. No publication or product/edition assignment changes."
+      },
+      "files": [
+        {
+          "path": "credentials/DelightApi.credentials.ts",
+          "sha256": "8af2e3602171d6b33497a6ad71ea126c5952fb9bb2ebb5e4b08770021fec987b",
+          "reviewNote": "Optional English/German label setting and credential-test body expression; login and authenticate implementations retained."
+        },
+        {
+          "path": "nodes/Delight/api/events.ts",
+          "sha256": "0eef06de302c1a236124fd4c66431a15afd440388fd3ccf602147e84a369d03c",
+          "reviewNote": "Credential language resolved centrally for schema and field metadata; record and document endpoint bodies unchanged."
+        },
+        {
+          "path": "nodes/Delight/methods/loadOptions.ts",
+          "sha256": "0eb94c5710ababe7bd52181a47a751bf43d5a071b2d4fd930bf93d5d8f7370df",
+          "reviewNote": "Unchanged scoped review: title/name separation and intersection of available API schemas with the supported document schema set."
+        },
+        {
+          "path": "nodes/Delight/methods/resourceMapping.ts",
+          "sha256": "4ac7a72d81444e1bde02da7fd07a3f8ac0437d313391ae216a3bac2bf11d9130",
+          "reviewNote": "Unchanged scoped review: localized displayName and stable field.name mapper ID/type."
+        },
+        {
+          "path": "nodes/Delight/constants/schemas.ts",
+          "sha256": "7c102822e3b5ca71456a5aa9f7f8b5027b21f5494da3ecfe3ba08a195837297f",
+          "reviewNote": "Explanatory platform invariant comment only; all four mappings and intentional products/claims UID sharing retained."
+        },
+        {
+          "path": "nodes/Delight/resources/dataset/fields/getSingle.ts",
+          "sha256": "d11244902591fc72fe47228fb501305a5981b542a19cc8554471801c84d55d5f",
+          "reviewNote": "Unchanged document-option visibility restricted to supported schemas."
+        },
+        {
+          "path": "nodes/Delight/resources/dataset/actions/get.ts",
+          "sha256": "a6109d835793cfb64856b657b5dd30380e85cd09a5b29ccf7909391f28a965b2",
+          "reviewNote": "Unchanged container/schema/record selection and unsupported-schema skip behavior."
+        },
+        {
+          "path": "nodes/Delight/resources/attachedDocument/index.ts",
+          "sha256": "c809a7ac331a6838dd5ea1094b69c5f5deac4e47bd071bc0c169471253a574ed",
+          "reviewNote": "Unchanged API-filtered supported-schema selector shared by upload and download."
+        },
+        {
+          "path": "nodes/Delight/resources/attachedDocument/actions/download.ts",
+          "sha256": "643bdfeaf459c8387703c72ef2adcef8cee150cbb4090820c1995622e4f95676",
+          "reviewNote": "Unchanged document lookup and unsupported-schema empty result; request triples and binary output exercised."
+        },
+        {
+          "path": "nodes/Delight/resources/attachedDocument/actions/upload.ts",
+          "sha256": "3252b4272a626b504d9bf63477be0929d6197a05224fa46a6066b9a0a66a9352",
+          "reviewNote": "Unchanged record_documents UpdateRecord payload exercised without container lookup."
+        },
+        {
+          "path": "nodes/Delight/utils/binaryUtils.ts",
+          "sha256": "717979236200ca73b9bfe559b38ee08433ca67db19f10e121664dcf2ed071308",
+          "reviewNote": "Unchanged document listing/download path, folder metadata, and binary conversion exercised."
+        },
+        {
+          "path": "nodes/Delight/Delight.node.ts",
+          "sha256": "18c1b9c9a67c2809a0fa2cb206938724e30b3b22c22220e5975ab52bd1d86a2b",
+          "reviewNote": "Unused requestDefaults removed; execute implementation and workflow identifiers retained."
+        },
+        {
+          "path": "nodes/Delight/Delight.node.json",
+          "sha256": "d23327594709eb84afcb346f2461df95d62b5cc8eeacd8d46f1d517c6dbd5a43",
+          "reviewNote": "Only node identifier changed to n8n-nodes-delight.delight."
+        },
+        {
+          "path": "nodes/Delight/DelightPollingTrigger.node.json",
+          "sha256": "3a5e2b54a18ca7bd6878f23cafd8463d73b4fafa88262311d0ea04545f0a5e04",
+          "reviewNote": "Only node identifier changed to n8n-nodes-delight.delightPollingTrigger."
+        },
+        {
+          "path": "nodes/Delight/DelightWebhookTrigger.node.json",
+          "sha256": "fc4e109906130be362ee8158a88e850fd9354a94d10d288d9ac8db8aca4be713",
+          "reviewNote": "Only node identifier changed to n8n-nodes-delight.delightWebhookTrigger."
+        },
+        {
+          "path": "nodes/Delight/api/delightApi.ts",
+          "sha256": "2c655c1615e8062ad90d4efabc9880c8648215c0675e2720966cc10d2257f508",
+          "reviewNote": "Unchanged scoped check against HEAD: URL resolution, JSON options, authenticated helper delegation and response validation."
+        },
+        {
+          "path": "nodes/Delight/api/sessionConfiguration.ts",
+          "sha256": "bd3f3f7ca76316f2749e10d233a9ce90c21b9788b6482b5551dc22bdd708f1e2",
+          "reviewNote": "Unchanged scoped check against HEAD: fingerprint excludes label language."
+        },
+        {
+          "path": "test/authentication.test.cjs",
+          "sha256": "4016c330cc6287344a6bfba9454e4bf00846a9b036ea2045e7276ca7e81e5080",
+          "reviewNote": "Extended existing suite to 56 passing tests, including native workflow expression evaluation, metadata labels/IDs, document mappings and upload/download, and generated codex metadata."
+        },
+        {
+          "path": "README.md",
+          "sha256": "a0ffe25acbb8d83ff253ea95f35fe8befc2b0f187ce28fa9a41405df2a3bf66b",
+          "reviewNote": "English display-language, fixed document mapping, unsupported-schema, validation, and reviewer-acceptance documentation."
+        },
+        {
+          "path": "docs/features-and-scope.md",
+          "sha256": "bc27aa3b5a2c7fa91c547a1f0256bd363a888ddf86c4aed5c70488b2134acc75",
+          "reviewNote": "Scoped functional update with product-owner-confirmed invariants and independent evidence limits; earlier review dates preserved."
+        }
+      ]
+    },
+    {
+      "reviewedAt": "2026-10-27",
+      "scope": "Manual schema/module simplification integration review",
+      "sourceCommit": "7a13fea6d715d53ad6678976aa4d5d136ec850f0",
+      "sourceWorkingTreeStatus": "Reviewed pre-existing uncommitted documentation/tests and manual schema/module refactoring, including new modules.ts, plus focused terminology, formatting and regression-test corrections. No commit or version change.",
+      "method": "Current-source and complete working-tree diff review of module UIDs, schema mapping, derived array, consumers and document helpers. Build and 57 tests use the existing pinned n8n authentication harness and n8n defaults/expression/display-option helpers with simulated transport. This review supersedes the 2026-10-26 snapshot for schema/module terminology and current source state only; earlier snapshots remain historical.",
+      "validation": [
+        "npm run test:auth: build and all 57 tests passed; no skips. Includes all four module/schema/record request triples, shared POLICY schemas, actual document-option visibility, upload/download, authentication, language selection, polling, webhooks and codex metadata.",
+        "./node_modules/.bin/tsc --noEmit --incremental false: passed.",
+        "npm run lint: could not complete because ESLint traversed an unavailable synthetic .aws directory (ENOENT), including the retry. Direct ESLint with --no-inline-config on nodes, credentials and package.json passed. No lint configuration or suppression changes.",
+        "Prettier check of modules.ts, schemas.ts and the extended test file using existing style conventions: passed.",
+        "npm pack --dry-run --ignore-scripts and local npm pack --ignore-scripts: passed. Inspected all 151 archive entries, verified exact dist bytes, new modules.js/declarations/source map and schema dependency, preserved UID values, node/credential entry points, all codex identifiers and README. Version remains 1.0.5.",
+        "Confirmed module UID values and supported schema list unchanged from the manual changes at task start. Manual load-options and download consumer edits preserved byte-for-byte.",
+        "Confirmed credentials (English/German only), shared HTTP helper, session fingerprint, node implementations, trigger handlers, upload implementation, parameter definitions and package metadata unchanged against HEAD.",
+        "Active source/tests/docs have no removed registry/Set/schemaUidMap references; historical source-review records retained. Local documentation links checked; pre-existing unavailable Core overview link retained.",
+        "git diff --check: passed."
+      ],
+      "limitations": [
+        "No live Delight API, full n8n editor or production/deployment validation. Tests establish request and UI-visibility logic with simulated API responses, not cross-installation compatibility.",
+        "Existing unsupported-schema behavior remains: Dataset Get skips documents and Attached Document Download returns an empty result without a document request.",
+        "Product-owner-confirmed standard module UIDs and shared POLICY association still require explicit n8n reviewer acceptance; independent backend module registration/DocumentStore contract evidence and representative separate-installation results remain outstanding.",
+        "No package publication, registry scan, commit, push or package version/dependency changes."
+      ],
+      "websiteHandoff": {
+        "capabilityId": "n8n",
+        "status": "pending",
+        "scope": "Correct schema/module terminology in the central overview alongside the prior pending display-language/document-support handoff. No publication or product/edition assignment changes."
+      },
+      "files": [
+        {
+          "path": "nodes/Delight/constants/modules.ts",
+          "sha256": "de1eabc5ebf164fd465776b37ddae0a158d3ed5e7a6478daeb1afc479c314f04",
+          "reviewNote": "Standard POLICY, CRM_ACTION, and ARTICLES module UIDs; values unchanged from the manual refactor. Comment, indentation, and final newline corrected."
+        },
+        {
+          "path": "nodes/Delight/constants/schemas.ts",
+          "sha256": "f32e1f1434ae676712595241f2f3c90c01ab4556b05190b6dbd71ddd24b7bf46",
+          "reviewNote": "Simplified schema-to-module UID mapping retained with exactly four supported schemas. Derived array retained; clarified intentional shared POLICY module and corrected import quoting."
+        },
+        {
+          "path": "nodes/Delight/methods/loadOptions.ts",
+          "sha256": "edee2219c97fa8df130a21acaee0932d86fef27121f481cf5aa9661f902113ad",
+          "reviewNote": "Manual Array.includes filtering retained unchanged; API results intersect with supported schemas without collapsing schemas sharing one module."
+        },
+        {
+          "path": "nodes/Delight/resources/dataset/fields/getSingle.ts",
+          "sha256": "d11244902591fc72fe47228fb501305a5981b542a19cc8554471801c84d55d5f",
+          "reviewNote": "Unchanged derived-array displayOptions; tested actual n8n parameter visibility for supported/unsupported schemas, operation and resource."
+        },
+        {
+          "path": "nodes/Delight/resources/dataset/actions/get.ts",
+          "sha256": "f819649ae5361ff2bd8baaab9fff34eb928f6e3c40fd4b6907fd4a8fe622bcd8",
+          "reviewNote": "Manual mapping lookup and moduleUid naming retained unchanged; checked download flag, mapped module and returned record UID guards and request arguments."
+        },
+        {
+          "path": "nodes/Delight/resources/attachedDocument/index.ts",
+          "sha256": "c809a7ac331a6838dd5ea1094b69c5f5deac4e47bd071bc0c169471253a574ed",
+          "reviewNote": "Unchanged shared schema dropdown delegates to API-filtered supported schemas for both upload and download."
+        },
+        {
+          "path": "nodes/Delight/resources/attachedDocument/actions/download.ts",
+          "sha256": "6daf959ad9344f6b294c59f5cd87e14fc06bebd24468f0c7835fd1de19f735bd",
+          "reviewNote": "Manual mapping lookup retained unchanged; all four exact module/schema/record request triples and unsupported-schema behavior exercised."
+        },
+        {
+          "path": "nodes/Delight/resources/attachedDocument/actions/upload.ts",
+          "sha256": "3252b4272a626b504d9bf63477be0929d6197a05224fa46a6066b9a0a66a9352",
+          "reviewNote": "Unchanged record_documents UpdateRecord path exercised by existing upload regression; no module lookup introduced."
+        },
+        {
+          "path": "nodes/Delight/api/events.ts",
+          "sha256": "3b9ddabcb685b8546ea2ad62d2c4df31bdd84310cc683c1f966f445e48342bdc",
+          "reviewNote": "Document-list parameter renamed from containerUid to moduleUid only; positional request body, endpoint and unrelated metadata/CRUD wrappers retained."
+        },
+        {
+          "path": "nodes/Delight/utils/binaryUtils.ts",
+          "sha256": "1187c368ee20831f72c1fcb255e25f5db153285409ef7bcd2b2854f47fdb949b",
+          "reviewNote": "Document-list argument renamed to moduleUid only; traversal, document downloads, binary conversion and metadata behavior retained."
+        },
+        {
+          "path": "test/authentication.test.cjs",
+          "sha256": "4a3851d910f5d5f7f3159f377efedcc8f93557d22e2333bc2770bd07fa1ed09a",
+          "reviewNote": "Retained independent literal UID expectations for both download paths; included both POLICY schemas in dropdown test, added one n8n parameter-visibility regression, and aligned terminology. All 57 tests pass."
+        },
+        {
+          "path": "README.md",
+          "sha256": "dc17aa4fc30110100e1a6eafbcae9adea269be78d21276d697415be1b342ef54",
+          "reviewNote": "Corrected schema/module terminology and mapping table; linked actual module/mapping sources. Existing English/German language guidance and document limitations retained."
+        },
+        {
+          "path": "docs/features-and-scope.md",
+          "sha256": "1d32add2b792f17f201f71ff291b550880e9190c16bb3a6c6df01baaf76eb924",
+          "reviewNote": "Scoped schema/module documentation correction and 2026-10-27 review; prior dates and pending website handoff retained."
+        }
+      ]
+    },
+    {
+      "reviewedAt": "2026-10-27",
+      "scope": "Documentation simplification and regression-test organization only",
+      "sourceCommit": "7a13fea6d715d53ad6678976aa4d5d136ec850f0",
+      "sourceWorkingTreeStatus": "Reviewed focused documentation, test-file moves/shared harness extraction, package script and CI edits on top of existing uncommitted verification changes. Production sources preserved byte-for-byte from task start.",
+      "method": "Reviewed current documentation and test responsibilities. Retained this file because AGENTS.md requires scoped source-review records for the functional documentation and website handoff; no local runtime, build, CI or generation code consumes it. Historical snapshots preserved. Compared all 41 original top-level test/data/helper blocks and the extracted harness bodies verbatim, then ran all 57 tests.",
+      "validation": [
+        "npm test: build and all 57 tests passed across four suites, with zero skips. The sandboxed attempt hit spawnSync tar EPERM; the full command passed outside the sandbox.",
+        "npm run lint: passed.",
+        "./node_modules/.bin/tsc --noEmit --incremental false: passed.",
+        "Confirmed every original test/data/helper block and all assertions were preserved verbatim; no tests removed or duplicated. The original n8n-runtime.cjs helper is unchanged.",
+        "Confirmed npm test and CI use the same all-suite runner; test:auth delegates to npm test.",
+        "npm pack --dry-run --ignore-scripts and local npm pack --ignore-scripts: passed. Inspected 151 archive entries, exact dist bytes, updated README/scripts, node/credential entry points and codex identifiers. Test infrastructure is excluded from the published file list.",
+        "Confirmed all nodes/ and credentials/ source bytes unchanged from task start, along with package version/dependency metadata. Version remains 1.0.5.",
+        "Local documentation links checked; existing unavailable Core overview link retained.",
+        "git diff --check: passed."
+      ],
+      "limitations": [
+        "Documentation and test organization only; no new live API, full editor or deployment validation, and no broader functionality re-review.",
+        "No package publication, commit, push, release or version/dependency changes. Existing verification and pending website handoff boundaries remain unchanged."
+      ],
+      "files": [
+        {
+          "path": "README.md",
+          "sha256": "1c8ef5ec5fcc013be7429ab386982b47b2f12dac7e2458b8858451ba20d0fadd",
+          "reviewNote": "Replaced detailed document mapping/API explanations with supported-schema availability and user-facing limitations. Removed verification-process detail and updated full-suite test instructions; unrelated content retained."
+        },
+        {
+          "path": "docs/features-and-scope.md",
+          "sha256": "3c701050e2b8e5db7e9dde487f3853e39e076587eafc981eab25d8258998781b",
+          "reviewNote": "Removed UID values, internal constant names and document API implementation narrative; retained functional limits, source references and historical review conventions. Updated links for moved tests."
+        },
+        {
+          "path": "test/authentication.test.cjs",
+          "sha256": "a3ac7a23abaa7dc9c54c9883d8bbeee72e121a7001927b8f57b0fa7a62045782",
+          "reviewNote": "Authentication and credential tests retained; unrelated test blocks moved verbatim to responsibility-specific suites. Uses the extracted existing harness."
+        },
+        {
+          "path": "test/node-execution.test.cjs",
+          "sha256": "dc18ef4354721d4ade1eac75ad24edada1013bd17d02a51c10f9c4622509930d",
+          "reviewNote": "Unchanged test blocks for record execution, error continuation, polling, webhooks and endpoint wrappers."
+        },
+        {
+          "path": "test/node-metadata.test.cjs",
+          "sha256": "2c15ad5bfd62cc950657091a2e218e82c94a12afb828397794ff7f572b15f08d",
+          "reviewNote": "Unchanged test blocks for dynamic options, metadata language/identifier stability and codex identifiers."
+        },
+        {
+          "path": "test/documents.test.cjs",
+          "sha256": "7752a5c15ca2f836639b99dc0e87a7708b070a6000fc71d0c062dade18102d7d",
+          "reviewNote": "Unchanged document/schema tests, literal module UID expectations, visibility checks and upload/download assertions."
+        },
+        {
+          "path": "test/helpers/delight-harness.cjs",
+          "sha256": "ce40c92bfd00d176d94bfb093d14b071e26f72a544878cd8cf0bd95c4c496735",
+          "reviewNote": "Existing configuration, HTTP error and credential/API harness bodies extracted verbatim once. Explicit per-suite initialization reuses the unchanged pinned n8n runtime helper."
+        },
+        {
+          "path": "package.json",
+          "sha256": "fe910823226b9b524a34b8613d76e0a2d45263a6e76b18b2a3216e87af3676f2",
+          "reviewNote": "Added npm test for build plus all test/*.test.cjs suites. Preserved test:auth as a full-suite alias; serial suite execution avoids first-run shared archive-cache races. Other metadata and version unchanged."
+        },
+        {
+          "path": ".github/workflows/ci.yml",
+          "sha256": "52ecf08eca5cb23a80abff3d29e85023c006e172fb8c3cae8d622e9ec52f24bb",
+          "reviewNote": "Renamed the test step and expanded its runner to all four suites after the existing build. Same serial runner as npm test."
+        }
+      ]
     }
   ]
 }
