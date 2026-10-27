@@ -30,13 +30,6 @@ export class Delight implements INodeType {
 		inputs: [NodeConnectionTypes.Main],
 		outputs: [NodeConnectionTypes.Main],
 		credentials: [{ name: 'delightApi', required: true }],
-		requestDefaults: {
-			baseURL: '={{$credentials.restApiUrl}}',
-			headers: {
-				Accept: 'application/json',
-				'Content-Type': 'application/json'
-			}
-		},
 		properties: [
 			{
 				displayName: 'Resource',
