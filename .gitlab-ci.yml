@@ -2,6 +2,7 @@
 sync_github_release:
   stage: deploy
   image: alpine:3.22
+  tags: [linux]
   variables:
     GIT_DEPTH: '0'
   resource_group: github-release-sync
