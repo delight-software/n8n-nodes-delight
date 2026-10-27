@@ -33,5 +33,6 @@ jobs:
       - name: Run build
         run: npm run build
 
-      - name: Run authentication tests
-        run: node --test test/authentication.test.cjs
+      # Suites share the first-run n8n archive cache.
+      - name: Run regression tests
+        run: node --test --test-concurrency=1 test/*.test.cjs

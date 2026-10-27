@@ -1,138 +1,17 @@
 const assert = require('node:assert/strict')
 const { before, test } = require('node:test')
-const { Expression, NodeApiError, NodeHelpers } = require('n8n-workflow')
-const { prepareN8nRuntime } = require('./helpers/n8n-runtime.cjs')
+const { NodeApiError, Workflow } = require('n8n-workflow')
 const { DelightApi } = require('../dist/credentials/DelightApi.credentials')
-const { delightApiRequest } = require('../dist/nodes/Delight/api/delightApi')
 const { getSessionConfiguration } = require('../dist/nodes/Delight/api/sessionConfiguration')
 const events = require('../dist/nodes/Delight/api/events')
+const {
+	prepareHarness,
+	configuration,
+	httpError,
+	harness
+} = require('./helpers/delight-harness.cjs')
 
-let runtime
-before(async () => {
-	runtime = await prepareN8nRuntime()
-})
-
-const configuration = (changes = {}) => ({
-	restApiUrl: 'https://api.example.invalid/rest/',
-	username: 'test-user',
-	password: 'test-password',
-	...changes
-})
-
-function httpError(status) {
-	return Object.assign(new Error(`HTTP ${status}`), {
-		response: { status, data: { message: `HTTP ${status}` } }
-	})
-}
-
-function harness() {
-	const credential = new DelightApi()
-	const stored = new Map([['first', configuration()]])
-	const sessions = new Map()
-	const calls = []
-	const writes = []
-	let sequence = 0
-	const h = { credential, stored, sessions, calls, writes }
-	h.onLogin = async (options) => {
-		const identity = JSON.stringify([options.url, options.body[0]])
-		if (!sessions.has(identity)) sessions.set(identity, `session-${++sequence}`)
-		return { result: [sessions.get(identity), true, { auth: true }] }
-	}
-	h.onRequest = async (options) => {
-		if (options.url.endsWith('/QuerySchemas')) {
-			return {
-				result: [true, { schemas: [{ name: '@table:contacts', title: 'Contacts', fields: [] }] }]
-			}
-		}
-		return { result: [true, { records: [] }] }
-	}
-	const transport = async (options) => {
-		calls.push(structuredClone(options))
-		return options.url.endsWith('/Authentication/Login') ? h.onLogin(options) : h.onRequest(options)
-	}
-	const nativeRequest = runtime.createRequestHelper(transport)
-	const credentialsHelper = new runtime.CredentialsHelper({
-		getByName: (type) => {
-			assert.equal(type, 'delightApi')
-			return credential
-		},
-		getParentTypes: () => []
-	})
-	// Only persistence is substituted: n8n's preAuthentication and authenticate
-	// implementations above execute unchanged, including their merge behavior.
-	credentialsHelper.getCredentials = async ({ id }) => ({
-		getData: async () => structuredClone(stored.get(id))
-	})
-	credentialsHelper.updateCredentials = async ({ id }, type, data) => {
-		assert.equal(type, 'delightApi')
-		stored.set(id, structuredClone(data))
-		writes.push({ id, data: structuredClone(data) })
-	}
-	h.context = (id = 'first', parameters = {}, type = 'n8n-nodes-delight.delight') => {
-		const node = {
-			id: 'node',
-			name: 'Delight',
-			type,
-			typeVersion: 1,
-			position: [0, 0],
-			parameters,
-			credentials: { delightApi: { id, name: `Credential ${id}` } }
-		}
-		const staticData = {}
-		const context = {
-			getNode: () => node,
-			getWorkflow: () => ({ id: 'workflow' }),
-			getMode: () => 'trigger',
-			getWorkflowStaticData: () => staticData,
-			getNodeWebhookUrl: () => 'https://n8n.example.invalid/webhook/test',
-			getNodeParameter: (key, index, fallback) => parameters[key] ?? fallback,
-			getCurrentNodeParameter: (key) => parameters[key],
-			getCredentials: async (type) => {
-				assert.equal(type, 'delightApi')
-				const values = NodeHelpers.getNodeParameters(
-					credential.properties,
-					structuredClone(stored.get(id)),
-					true,
-					false,
-					null,
-					null
-				)
-				const expression = new Expression('UTC')
-				return Object.fromEntries(
-					Object.entries(values).map(([key, value]) => [
-						key,
-						expression.resolveSimpleParameterValue(value, {})
-					])
-				)
-			},
-			logger: { warn: () => assert.fail('Unexpected single-use request body') },
-			helpers: {
-				httpRequest: transport,
-				async httpRequestWithAuthentication(type, options, additionalOptions) {
-					assert.equal(this, context)
-					return nativeRequest.call(
-						context,
-						type,
-						options,
-						{},
-						node,
-						{ credentialsHelper },
-						additionalOptions
-					)
-				},
-				returnJsonArray: (data) => (Array.isArray(data) ? data : [data]).map((json) => ({ json })),
-				constructExecutionMetaData: (data, { itemData }) =>
-					data.map((item) => ({ ...item, pairedItem: itemData }))
-			}
-		}
-		return context
-	}
-	h.request = (context = h.context(), body = ['contacts', [], []]) =>
-		delightApiRequest(context, 'POST', '/database/table/QueryRecords', body)
-	h.logins = () => calls.filter((call) => call.url.endsWith('/Authentication/Login'))
-	h.requests = () => calls.filter((call) => !call.url.endsWith('/Authentication/Login'))
-	return h
-}
+before(prepareHarness)
 
 test('existing credentials log in with the exact payload and reuse the persisted session', async () => {
 	const h = harness()
@@ -148,6 +27,8 @@ test('existing credentials log in with the exact payload and reuse the persisted
 	assert.equal(h.writes.length, 1)
 	assert.equal(h.stored.get('first').sessionToken, 'session-1')
 	assert.equal(h.requests()[1].headers.SESSIONKEY, 'session-1')
+	assert.equal(h.requests()[0].url, 'https://api.example.invalid/rest/database/table/QueryRecords')
+	assert.deepEqual(h.requests()[0].headers, { SESSIONKEY: 'session-1' })
 	assert.deepEqual(h.requests()[0].body, ['contacts', [], []])
 	assert.equal(h.requests()[0].json, true)
 })
@@ -423,28 +304,51 @@ for (const [label, response, expected] of [
 	})
 }
 
-test('credential test resolves its URL, performs the real login hook once, and checks authenticated access', async () => {
-	const h = harness()
-	await h.request()
-	h.calls.length = 0
-	const context = h.context('first', { temp: '' }, 'n8n-nodes-base.noOp')
-	const expression = new Expression('UTC')
-	const baseURL = expression.resolveSimpleParameterValue(h.credential.test.request.baseURL, {
-		$credentials: await context.getCredentials('delightApi')
+async function resolveCredentialTestRequest(context, credential) {
+	const node = context.getNode()
+	const workflow = new Workflow({
+		nodes: [structuredClone(node)],
+		connections: {},
+		active: false,
+		nodeTypes: { getByNameAndVersion: () => ({ description: { properties: [] } }) },
+		settings: { timezone: 'UTC' }
 	})
-	const { baseURL: unused, ...request } = h.credential.test.request
-	assert.equal(unused, h.credential.test.request.baseURL)
-	const response = await context.helpers.httpRequestWithAuthentication.call(context, 'delightApi', {
-		...request,
-		url: `${baseURL}${request.url}`
+	// Use n8n's recursive request expression evaluation, including array body entries.
+	const { baseURL, ...request } = workflow.expression.getSimpleParameterValue(
+		node,
+		credential.test.request,
+		'internal',
+		{ $credentials: await context.getCredentials('delightApi') }
+	)
+	return { ...request, url: `${baseURL}${request.url}` }
+}
+
+for (const [label, settings, language] of [
+	['existing credentials', {}, 'english'],
+	['English', { labelLanguage: 'english' }, 'english'],
+	['German', { labelLanguage: 'german' }, 'german']
+]) {
+	test(`credential test resolves URL and language for ${label} and checks authenticated access`, async () => {
+		const h = harness()
+		h.stored.set('first', configuration(settings))
+		await h.request()
+		h.calls.length = 0
+		const context = h.context('first', { temp: '' }, 'n8n-nodes-base.noOp')
+		const request = await resolveCredentialTestRequest(context, h.credential)
+		assert.equal(request.url, 'https://api.example.invalid/rest/database/schema/QuerySchemas')
+		const response = await context.helpers.httpRequestWithAuthentication.call(
+			context,
+			'delightApi',
+			request
+		)
+		assert.equal(response.result[0], true)
+		assert.equal(h.logins().length, 1)
+		assert.equal(h.requests().length, 1)
+		assert.deepEqual(h.requests()[0].body, [[], false, language])
+		assert.equal(h.requests()[0].headers.SESSIONKEY, 'session-1')
+		assert.equal(h.credential.test.rules[0].properties.key, 'result[0]')
 	})
-	assert.equal(response.result[0], true)
-	assert.equal(h.logins().length, 1)
-	assert.equal(h.requests().length, 1)
-	assert.deepEqual(h.requests()[0].body, [[], false, 'german'])
-	assert.equal(h.requests()[0].headers.SESSIONKEY, 'session-1')
-	assert.equal(h.credential.test.rules[0].properties.key, 'result[0]')
-})
+}
 
 for (const [label, result, message] of [
 	['invalid credentials', ['', false], 'delight API Authentication failed'],
@@ -461,12 +365,11 @@ for (const [label, result, message] of [
 		h.onLogin = async () => ({ result })
 		const context = h.context('first', { temp: '' }, 'n8n-nodes-base.noOp')
 		await assert.rejects(
-			context.helpers.httpRequestWithAuthentication.call(context, 'delightApi', {
-				url: 'https://api.example.invalid/rest/database/schema/QuerySchemas',
-				method: 'POST',
-				body: [[], false, 'german'],
-				json: true
-			}),
+			context.helpers.httpRequestWithAuthentication.call(
+				context,
+				'delightApi',
+				await resolveCredentialTestRequest(context, h.credential)
+			),
 			{ message }
 		)
 		assert.equal(h.logins().length, 1)
@@ -474,146 +377,42 @@ for (const [label, result, message] of [
 	})
 }
 
-test('existing Get Many workflow parameters retain grouped filter semantics', async () => {
-	const { Delight } = require('../dist/nodes/Delight/Delight.node')
-	const h = harness()
-	const context = h.context('first', {
-		resource: 'dataset',
-		operation: 'getMany',
-		schema: '@table:contacts',
-		returnFields: ['name'],
-		returnAll: false,
-		limit: 5,
-		filters: {
-			filter: [
-				{
-					logicalOperator: 'and',
-					openGroup: true,
-					fieldName: 'name',
-					filterType: 'LIKE',
-					value: 'A'
-				},
-				{ logicalOperator: 'or', closeGroup: true, fieldName: 'name', filterType: 'eq', value: 'B' }
-			]
-		}
-	})
-	context.getInputData = () => [{ json: {} }]
-	context.continueOnFail = () => false
-	await new Delight().execute.call(context)
-	assert.deepEqual(h.requests()[0].body, [
-		'@table:contacts',
-		[
-			'(',
-			{ fieldname: 'name', filtertype: 'LIKE', value: '%A%' },
-			'or',
-			{ fieldname: 'name', filtertype: 'eq', value: 'B' },
-			')'
-		],
-		['globalrecuid', 'name'],
-		{ start: 0, count: 5 }
+test('label language is optional and defaults to English', () => {
+	const field = new DelightApi().properties.find((property) => property.name === 'labelLanguage')
+	assert.equal(field.displayName, 'Label Language')
+	assert.equal(field.type, 'options')
+	assert.equal(field.default, 'english')
+	assert.ok(!field.required)
+	assert.deepEqual(field.options, [
+		{ name: 'English', value: 'english' },
+		{ name: 'German', value: 'german' }
 	])
 })
 
-test('normal node execution and continueOnFail use the authenticated helper', async () => {
-	const { Delight } = require('../dist/nodes/Delight/Delight.node')
-	const h = harness()
-	const context = h.context('first', {
-		resource: 'dataset',
-		operation: 'create',
-		schema: '@table:contacts',
-		fields: { value: { name: 'Example' } }
-	})
-	context.getInputData = () => [{ json: {} }]
-	context.continueOnFail = () => false
-	h.onRequest = async () => ({ result: [true, { record_info: [{ server_uid: 'created' }] }] })
-	const result = await new Delight().execute.call(context)
-	assert.equal(result[0][0].json.server_uid, 'created')
-	context.continueOnFail = () => true
-	h.onRequest = async () => ({
-		result: [false, { error: { class: 'WriteError', message: 'Rejected' } }]
-	})
-	const failure = await new Delight().execute.call(context)
-	assert.match(failure[0][0].json.error, /WriteError/)
-	assert.equal(h.logins().length, 1)
-	assert.equal(h.requests().length, 2)
-})
-
-test('load options and resource mapping reuse authenticated schema requests', async () => {
-	const options = require('../dist/nodes/Delight/methods/loadOptions')
-	const mapping = require('../dist/nodes/Delight/methods/resourceMapping')
-	const h = harness()
-	const context = h.context('first', { schema: '@table:contacts' })
-	assert.deepEqual(await options.getOptionsDatasetSchemas.call(context), [
-		{ value: '@table:contacts', name: 'Contacts' }
-	])
-	await options.getOptionsDatasetFields.call(context)
-	await options.getOptionsDatasetFilteredFields.call(context)
-	await mapping.getResourceDatasetFields.call(context)
-	assert.equal(h.logins().length, 1)
-	assert.equal(h.requests().length, 4)
-})
-
-test('polling reuses sessions across poll contexts', async () => {
-	const { DelightPollingTrigger } = require('../dist/nodes/Delight/DelightPollingTrigger.node')
-	const h = harness()
-	const poll = () =>
-		new DelightPollingTrigger().poll.call(
-			h.context('first', {
-				schema: '@table:contacts',
-				event: 'created',
-				returnFields: []
-			})
-		)
-	assert.equal(await poll(), null)
-	assert.equal(await poll(), null)
-	assert.equal(h.logins().length, 1)
-	assert.equal(h.requests().length, 2)
-})
-
-test('webhook registration, lookup, cleanup, and inbound handling preserve their data flow', async () => {
-	const { DelightWebhookTrigger } = require('../dist/nodes/Delight/DelightWebhookTrigger.node')
-	const h = harness()
-	const context = h.context('first', { schema: '@table:contacts', events: ['created', 'updated'] })
-	let created = 0
-	h.onRequest = async (options) => {
-		if (options.url.endsWith('/AddRecord')) {
-			return { result: [true, { record_info: [{ server_uid: `created-${++created}` }] }] }
-		}
-		if (options.url.endsWith('/DeleteRecords')) return { result: [true, { result_info: {} }] }
-		return { result: [true, { records: [] }] }
-	}
-	const trigger = new DelightWebhookTrigger()
-	assert.equal(await trigger.webhookMethods.default.checkExists.call(context), false)
-	assert.equal(await trigger.webhookMethods.default.create.call(context), true)
-	assert.equal(await trigger.webhookMethods.default.delete.call(context), true)
-	assert.equal(h.logins().length, 1)
-	assert.equal(h.requests().filter((r) => r.url.endsWith('/AddRecord')).length, 2)
-	assert.equal(h.requests().filter((r) => r.url.endsWith('/DeleteRecords')).length, 2)
-	const requests = h.calls.length
-	context.getBodyData = () => ({ event: 'created' })
-	assert.deepEqual(await trigger.webhook.call(context), {
-		workflowData: [[{ json: { event: 'created' } }]]
-	})
-	assert.equal(h.calls.length, requests)
-})
-
-test('remaining endpoint wrappers retain their request bodies and one shared credential session', async () => {
+test('changing label language reuses the session and preserves record payloads and filters', async () => {
 	const h = harness()
 	const context = h.context()
-	await events.updateRecord.call(context, 's', 'uid', { name: 'A' }, ['name'])
-	await events.deleteRecord.call(context, 's', 'uid')
-	await events.addDocument.call(context, [{ name: 'a.txt', content: 'eA==' }])
-	await events.getRecordResourceList.call(context, 'container', 's', 'uid')
-	await events.getDocument.call(context, 'doc', 'pdf')
-	assert.equal(h.logins().length, 1)
+	await events.getSchemas.call(context, [], false)
+	const fingerprint = getSessionConfiguration(h.stored.get('first'))
+	h.stored.get('first').labelLanguage = 'german'
+	assert.equal(getSessionConfiguration(h.stored.get('first')), fingerprint)
+	await events.getSchemas.call(context, [], false)
+	const schema = '@table:contacts'
+	const values = { descr: 'Unchanged record value' }
+	const filters = [{ fieldname: 'descr', filtertype: '=', value: values.descr }]
+	await events.addRecord.call(context, schema, [values], ['descr'])
+	await events.updateRecord.call(context, schema, 'record-uid', values, ['descr'])
+	await events.getRecords.call(context, schema, filters, ['descr'])
 	assert.deepEqual(
-		h.requests().map((r) => new URL(r.url).pathname),
+		h.requests().map((request) => request.body),
 		[
-			'/rest/database/table/UpdateRecord',
-			'/rest/database/table/DeleteRecords',
-			'/rest/documentscenter/DocumentsInbox/AddDocuments',
-			'/rest/services/DocumentStore/QueryRecordResourceList',
-			'/rest/services/DocumentStore/DownloadDocumentEx'
+			[[], false, 'english'],
+			[[], false, 'german'],
+			[schema, [values], ['descr']],
+			[schema, [{ server_uid: 'record-uid', ...values }], ['descr']],
+			[schema, filters, ['globalrecuid', 'descr'], { start: -1, count: -1 }]
 		]
 	)
+	assert.equal(h.logins().length, 1)
+	assert.equal(h.writes.length, 1)
 })
