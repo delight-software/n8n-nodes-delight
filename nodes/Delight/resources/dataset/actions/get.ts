@@ -1,7 +1,7 @@
 import { IDataObject, IExecuteFunctions, INodeExecutionData } from 'n8n-workflow'
 import { getRecords } from '../../../api/events'
 import { getValidatedGlobalRecUid } from '../../../utils/validators'
-import { SCHEMAS_WITH_DOCUMENTS_SET, schemaUidMap } from '../../../constants/schemas'
+import { SCHEMA_MODULE_UIDS_WITH_DOCUMENTS } from '../../../constants/schemas'
 import { getBinaryDocuments } from '../../../utils/binaryUtils'
 
 export async function executeDatasetGet(
@@ -37,21 +37,16 @@ export async function executeDatasetGet(
 	const response = await getRecords.call(this, schema, filters, returnFields)
 	const json: IDataObject = response?.records?.[0] ?? {}
 
-	const schemaUid = schemaUidMap[schema]
+	const moduleUid = SCHEMA_MODULE_UIDS_WITH_DOCUMENTS[schema]
 	const globalrecuid = json.globalrecuid as string
 
-	if (
-		!downloadDocuments ||
-		!SCHEMAS_WITH_DOCUMENTS_SET.has(schema) ||
-		!schemaUid ||
-		!globalrecuid
-	) {
+	if (!downloadDocuments || !moduleUid || !globalrecuid) {
 		return { json }
 	}
 
 	const { binaryData, metadata } = await getBinaryDocuments.call(
 		this,
-		schemaUid,
+		moduleUid,
 		schema,
 		globalrecuid,
 		documentPrefix

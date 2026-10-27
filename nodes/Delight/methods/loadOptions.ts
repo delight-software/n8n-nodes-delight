@@ -1,6 +1,6 @@
 import { ILoadOptionsFunctions, INodePropertyOptions } from 'n8n-workflow'
 import { getFilteredSchemaFields, getSchemaFields, getSchemas } from '../api/events'
-import { SCHEMAS_WITH_DOCUMENTS_SET } from '../constants/schemas'
+import { SCHEMAS_WITH_DOCUMENTS } from '../constants/schemas'
 
 async function getOptionsDatasetSchemas(
 	this: ILoadOptionsFunctions
@@ -31,7 +31,7 @@ async function getOptionsDatasetSchemasWithDocuments(
 	this: ILoadOptionsFunctions
 ): Promise<INodePropertyOptions[]> {
 	const schemas = await getOptionsDatasetSchemas.call(this)
-	return schemas.filter((schema) => SCHEMAS_WITH_DOCUMENTS_SET.has(schema.value as string))
+	return schemas.filter((schema) => SCHEMAS_WITH_DOCUMENTS.includes(schema.value as string))
 }
 
 async function getOptionsDatasetFields(

@@ -1,6 +1,6 @@
 import { IDataObject, IExecuteFunctions, INodeExecutionData } from 'n8n-workflow'
 import { getValidatedGlobalRecUid } from '../../../utils/validators'
-import { schemaUidMap } from '../../../constants/schemas'
+import { SCHEMA_MODULE_UIDS_WITH_DOCUMENTS } from '../../../constants/schemas'
 import { getBinaryDocuments } from '../../../utils/binaryUtils'
 
 export async function executeAttachedDocumentDownload(
@@ -20,15 +20,15 @@ export async function executeAttachedDocumentDownload(
 		documents: []
 	}
 
-	const schemaUid = schemaUidMap[schema]
+	const moduleUid = SCHEMA_MODULE_UIDS_WITH_DOCUMENTS[schema]
 
-	if (!schemaUid) {
+	if (!moduleUid) {
 		return { json }
 	}
 
 	const { binaryData, metadata } = await getBinaryDocuments.call(
 		this,
-		schemaUid,
+		moduleUid,
 		schema,
 		recordId,
 		documentPrefix
